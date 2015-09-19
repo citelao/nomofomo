@@ -3,17 +3,19 @@ import { Router, Route, IndexRoute } from "react-router";
 
 import App from "App";
 import Pitch from "views/Pitch";
-import Events from "views/Events";
-import Event from "views/Event/Event";
+import EventsView from "views/EventsView";
+import EventView from "views/Event/EventView";
 import EventCreate from "views/Event/EventCreate";
+import EventList from "views/Event/EventList";
 
 React.render(
 	(<Router>
 		<Route path="/" component={App}>
 			<IndexRoute component={Pitch} />
-			<Route path="events" component={Events}>
+			<Route path="events" component={EventsView}>
+				<IndexRoute component={EventList} />
 				<Route path="create" component={EventCreate} />
-				<Route path=":id" component={Event} />
+				<Route path=":id" component={EventView} />
 			</Route>
 		</Route>
 
