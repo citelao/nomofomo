@@ -1,6 +1,8 @@
 import React from "react";
 
+import Event from "views/event";
+
 React.render(
-	<h1>Hello, world!</h1>,
+	<Event />,
 	document.getElementById("entry")
 );

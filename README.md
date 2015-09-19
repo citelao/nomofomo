@@ -7,4 +7,4 @@ Because other people want to hang out with you.
 
 `gulp` compiles into `dist/`
 
-`gulp serve` launches a server on `8080`.
+`gulp serve` launches a server on `8080`, serving `index.html` from `public/`.
