@@ -5,7 +5,7 @@ import assign from "object-assign";
 import gulp from "gulp";
 import gutil from "gulp-util";
 import webpack from "webpack";
-import webpackDevServer from "webpack-dev-server";
+import WebpackDevServer from "webpack-dev-server";
 
 const webpackOptions = {
 	entry: "./src/index.js",
@@ -14,7 +14,8 @@ const webpackOptions = {
 		filename: "bundle.js"
 	},
 	resolve: {
-		root: path.resolve("./src")
+		root: path.resolve("./src"),
+		extensions: ['', '.js', '.jsx']
 	},
 	module: {
 		loaders: [
@@ -51,7 +52,7 @@ gulp.task("webpack", function(callback) {
 gulp.task("serve", function(callback) {
 	const compiler = webpack(assign({}, webpackOptions, webpackDebugOptions));
 
-	new webpackDevServer(compiler, webpackServerOptions).listen(8080, "localhost", function(err) {
+	new WebpackDevServer(compiler, webpackServerOptions).listen(8080, "localhost", function(err) {
 		if(err) {
 			throw new gutil.PluginError("webpack-dev-server", err);
 		}
