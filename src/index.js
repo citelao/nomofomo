@@ -1,10 +1,6 @@
-require("atest");
+import React from "react";
 
-console.log("right now just testing");
-
-// Test ES6 compilation
-function a (argument) {
-	console.log(argument);
-}
-
-a(() => { return "test"; });
+React.render(
+	<h1>Hello, world!</h1>,
+	document.getElementById("entry")
+);
