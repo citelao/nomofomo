@@ -13,6 +13,7 @@
     "webpack-dev-server": "^1.11.0"
   },
   "dependencies": {
+    "google-maps": "^3.1.0",
     "microcosm": "^9.5.0",
     "object-assign": "^4.0.1",
     "react": "^0.13.3",

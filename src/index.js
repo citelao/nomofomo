@@ -9,11 +9,10 @@ import EventCreate from "views/Event/EventCreate";
 React.render(
 	(<Router>
 		<Route path="/" component={App}>
-		</Route>
-
-		<Route path="/events" component={Events}>
-			<Route path="create" component={EventCreate} />
-			<Route path=":id" component={Event} />
+			<Route path="events" component={Events}>
+				<Route path="create" component={EventCreate} />
+				<Route path=":id" component={Event} />
+			</Route>
 		</Route>
 
 		<Route path="*" component={App} />{/* better 404 eventually */}
