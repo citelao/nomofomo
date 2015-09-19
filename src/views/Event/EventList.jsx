@@ -4,7 +4,6 @@ import Event from "../../modules/event";
 
 export default class EventList extends React.Component {
 	render() {
-		return <div><Event /></div>;
-		// return <Event />;
+		return <Event title={this.props.events[0].name} />;
 	}
 }

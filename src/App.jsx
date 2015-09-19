@@ -1,8 +1,9 @@
+import assign from "object-assign";
 import GoogleMapsLoader from "google-maps";
 import React from "react";
 import { Link } from "react-router";
 
-export default class Event extends React.Component {
+export default class App extends React.Component {
 	componentWillMount() {
 		GoogleMapsLoader.load((google) => {
 			new google.maps.Map(React.findDOMNode(this.refs.wrapper), {
