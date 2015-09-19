@@ -1,5 +1,6 @@
 /* eslint-env node */
 import path from "path";
+import assign from "object-assign";
 
 import gulp from "gulp";
 import gutil from "gulp-util";
@@ -25,6 +26,9 @@ const webpackOptions = {
 		]
 	}
 };
+const webpackDebugOptions = {
+	devtool: "cheap-module-eval-source-map"
+};
 const webpackServerOptions = {
 	contentBase: "./public"
 };
@@ -45,7 +49,7 @@ gulp.task("webpack", function(callback) {
 });
 
 gulp.task("serve", function(callback) {
-	const compiler = webpack(webpackOptions);
+	const compiler = webpack(assign({}, webpackOptions, webpackDebugOptions));
 
 	new webpackDevServer(compiler, webpackServerOptions).listen(8080, "localhost", function(err) {
 		if(err) {
