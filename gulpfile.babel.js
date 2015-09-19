@@ -11,7 +11,13 @@ const webpackOptions = {
 	output: {
 		path: path.join(__dirname, "dist/"),
 		filename: "bundle.js"
+	},
+	resolve: {
+		root: path.resolve("./src")
 	}
+};
+const webpackServerOptions = {
+	contentBase: "./public"
 };
 
 gulp.task("default", ["webpack"]);
@@ -32,9 +38,7 @@ gulp.task("webpack", function(callback) {
 gulp.task("serve", function(callback) {
 	const compiler = webpack(webpackOptions);
 
-	new webpackDevServer(compiler, {
-		// server and middleware options
-	}).listen(8080, "localhost", function(err) {
+	new webpackDevServer(compiler, webpackServerOptions).listen(8080, "localhost", function(err) {
 		if(err) {
 			throw new gutil.PluginError("webpack-dev-server", err);
 		}
