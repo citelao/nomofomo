@@ -1,13 +1,16 @@
 {
-	"name": "nomofomo",
-	"version": "v0.0.1",
-	"repository": "https://github.com/citelao/nomofomo",
-	"devDependencies": {
-		"babel-core": "^5.8.25",
-		"gulp": "^3.9.0",
-		"gulp-util": "^3.0.6"
-		},
-		"dependencies": {
-			"microcosm": "^9.5.0"
-		}
-	}
+  "name": "nomofomo",
+  "version": "v0.0.1",
+  "repository": "https://github.com/citelao/nomofomo",
+  "devDependencies": {
+    "babel-core": "^5.8.25",
+    "gulp": "^3.9.0",
+    "gulp-util": "^3.0.6",
+    "webpack": "^1.12.2",
+    "webpack-dev-server": "^1.11.0"
+  },
+  "dependencies": {
+    "microcosm": "^9.5.0",
+    "react": "^0.13.3"
+  }
+}
