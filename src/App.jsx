@@ -18,11 +18,6 @@ export default class Event extends React.Component {
 		return <div>
 			<div className="test" ref="wrapper" style={{position: "absolute", top: 0, bottom: 0, height: "100%", width: "100%", zIndex: -1}}></div>
 			<div className="wrapper">
-				<div className="card">
-					<h1>No Mo' FOMO</h1>
-					<h2>Because other people want to hang out with you.</h2>
-				</div>
-				<Link to="/events" className="card">Start searching!</Link>
 				{this.props.children}
 				<Link to="/events/create" className="card card--bottom">Create Event</Link>
 			</div>
