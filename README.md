@@ -1,2 +1,2 @@
 # nomofomo
-Because other people want to hang out with you
+Because other people want to hang out with you.
