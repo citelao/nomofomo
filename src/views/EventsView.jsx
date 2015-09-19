@@ -1,7 +1,7 @@
 import React from "react";
 // import { Link } from "react-router";
 
-import Event from "modules/event";
+import Event from "../components/event";
 
 export default class Events extends React.Component {
 	render() {

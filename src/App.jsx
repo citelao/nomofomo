@@ -3,23 +3,43 @@ import GoogleMapsLoader from "google-maps";
 import React from "react";
 import { Link } from "react-router";
 
-import SessionActions from "actions/SessionActions";
+import reactor from "reactor";
+import { getters } from "modules/session";
 
-export default class App extends React.Component {
+const App = React.createClass({
+	mixins: [reactor.ReactMixin],
+
+	getDataBindings() {
+		return {
+			location: getters.location
+		};
+	},
+
 	componentWillMount() {
-		navigator.geolocation.getCurrentPosition((l) => {
-			console.log(l.coords);
-
+		if(this.state.location) {
 			GoogleMapsLoader.load((google) => {
 				new google.maps.Map(React.findDOMNode(this.refs.wrapper), {
-					center: {lat: l.coords.latitude, lng: l.coords.longitude},
+					center: {lat: this.state.location.toJS().coords.latitude, lng: this.state.location.toJS().coords.longitude},
 					scrollwheel: false,
 					zoom: 8,
 					disableDefaultUI: true
 				});
 			});
-		});
-	}
+		}
+	},
+
+	componentWillUpdate(nextProps, nextState) {
+		if((!this.state.location) && (nextState.location)) {
+			GoogleMapsLoader.load((google) => {
+				new google.maps.Map(React.findDOMNode(this.refs.wrapper), {
+					center: {lat: nextState.location.coords.latitude, lng: nextState.location.coords.longitude},
+					scrollwheel: false,
+					zoom: 8,
+					disableDefaultUI: true
+				});
+			});	
+		}
+	},
 
 	render() {
 		return <div>
@@ -30,4 +50,6 @@ export default class App extends React.Component {
 			<div className="map" ref="wrapper"></div>
 		</div>;
 	}
-}
+});
+
+export default App;

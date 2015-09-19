@@ -1,9 +1,20 @@
 import React from "react";
 
-import Event from "../../modules/event";
+import reactor from "../../reactor";
+import Event from "../../components/event";
 
-export default class EventList extends React.Component {
+const EventList = React.createClass({
+	mixins: [reactor.ReactMixin],
+
+	getDataBindings() {
+		return {
+			// events: eventsGetter
+		};
+	},
+
 	render() {
 		return <Event title={this.props.events[0].name} />;
 	}
-}
+});
+
+export default EventList;
