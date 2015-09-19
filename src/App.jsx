@@ -16,7 +16,7 @@ export default class Event extends React.Component {
 
 	render() {
 		return <div>
-			<div className="test" ref="wrapper" style={{position: "absolute", top: 0, bottom: 0, height: "100%", width: "100%", zindex: -1}}></div>
+			<div className="test" ref="wrapper" style={{position: "absolute", top: 0, bottom: 0, height: "100%", width: "100%", zIndex: -1}}></div>
 			<div className="wrapper">
 				<div className="card">
 					<h1>No Mo' FOMO</h1>
