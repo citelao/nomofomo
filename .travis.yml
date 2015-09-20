@@ -9,3 +9,14 @@ script: gulp
 
 deploy:  
   provider: azure_web_apps
+before_deploy:
+  - mv dist/bundle.js public/bundle.js
+  - rm -r dist
+  - rm -r node_modules
+  - rm -r src
+  - rm package.json
+  - rm gulpfile.babel.js
+  - rm .eslintrc
+  - rm .travis.yml
+  - cp -r public/* ./*
+  - rm -r public

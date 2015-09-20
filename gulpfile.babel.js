@@ -15,7 +15,7 @@ const webpackOptions = {
 	},
 	resolve: {
 		root: path.resolve("./src"),
-		extensions: ['', '.js', '.jsx']
+		extensions: ["", ".js", ".jsx"]
 	},
 	module: {
 		loaders: [
