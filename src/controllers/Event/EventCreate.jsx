@@ -17,8 +17,6 @@ const EventCreate = React.createClass({
 
 
 	handleSubmit(e) {
-		console.log(this.state.user);
-		alert('asdf');
 		var name = React.findDOMNode(e.target).elements[0].value;
 		var location = React.findDOMNode(e.target).elements[1].value;
 		var description = React.findDOMNode(e.target).elements[2].value;
@@ -31,7 +29,6 @@ const EventCreate = React.createClass({
 		var params = "?creator_id=" + this.state.user + "&name=" + name + "&description=" + description + "&lat=43.471856&lng=-80.538886" +
 		"&loc=" + location + "&min_attendance=" + minAttendance + "&start_time=" + eventStartTime + "&duration=" + duration;
 		console.log(name + ',' + location + ',' + description + ',' + startTime + ',' + duration + ',' + minAttendance);
-		alert(params);
 		qwest.post("http://whispering-sea-1365.herokuapp.com/events" + params).then((xhr, result) => {
 			let events = JSON.parse(result);
 			alert(events);
