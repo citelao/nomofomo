@@ -1,7 +1,8 @@
 import reactor from "../../reactor";
 
 reactor.registerStores({
-	location: require("./stores/locationStore.js")
+	location: require("./stores/locationStore.js"),
+	user: require("./stores/userStore.js")
 });
 
 export default {
