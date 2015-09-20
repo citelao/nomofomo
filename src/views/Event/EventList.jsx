@@ -10,7 +10,7 @@ const EventList = React.createClass({
 
 	getDataBindings() {
 		return {
-			events: getters.events
+			event: getters.currentEvent
 		};
 	},
 
@@ -18,8 +18,14 @@ const EventList = React.createClass({
 		actions.getEvents();
 	},
 
+	handleSwipe() {
+		actions.swipeEvent();
+	},
+
 	render() {
-		return <Event title={this.state.events} />;
+		return <div onClick={this.handleSwipe}>
+		<Event title={this.state.event.get("name")} />
+		</div>;
 	}
 });
 

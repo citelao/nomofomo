@@ -8,10 +8,10 @@ export default new Store({
 	},
 
 	initialize() {
-		this.on(actionTypes.GET_LOCATION_SUCCESS, updateLocation);
+		this.on(actionTypes.GET_EVENTS_SUCCESS, updateEvents);
 	}
 });
 
-function updateLocation(state, { location }) {
-	return state.set("geo", toImmutable(location));
+function updateEvents(state, { events }) {
+	return toImmutable(events);
 }
