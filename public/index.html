@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 	<meta charset="UTF-8">
-	<title>No Mo' FOMO&mdash;Because people want to hang out with you </title>
+	<title>nomofomo&mdash;Because people want to hang out with you </title>
 
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 
@@ -14,6 +14,7 @@
 		body {
 			background: #ddd;
 			font-family: Helvetica;
+			line-height: 1.5;
 			width: 100%;
 		}
 
@@ -61,7 +62,8 @@
 		}
 
 		img {
-			max-width: 100%;
+			max-width: 60%;
+
 		}
 
 		input {
@@ -76,6 +78,59 @@
 		label {
 			text-align: left;
 		}
+
+		.button {
+			background: 0;
+			border: 0;
+			border-radius: 0.1rem;
+			padding: 2rem;
+			font-size: inherit;
+		}
+
+			.button:hover {
+				cursor: pointer;
+			}
+
+			.button--left {
+				border-bottom-right-radius: 0;
+				border-top-right-radius: 0;
+			}
+
+			.button--right {
+				border-bottom-left-radius: 0;
+				border-top-left-radius: 0;
+			}
+
+			.button--bad {
+				color: #B31803;
+				background: #eee;
+			}
+
+				.button--bad:hover {
+					background: #bbb;
+				}
+
+			.button--good {
+				background: #14B600;
+				color: #fff;
+			}
+
+				.button--good:hover {
+					background: #057A00;
+				}
+		.cf {
+		    *zoom: 1;
+		}
+
+			.cf:before,
+			.cf:after {
+			    content: " ";
+			    display: table;
+			}
+
+			.cf:after {
+			    clear: both;
+			}
 
 	</style>
 </head>

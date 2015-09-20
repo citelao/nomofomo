@@ -28,13 +28,13 @@ const App = React.createClass({
 				loadMap(React.findDOMNode(this.refs.map),
 					this.state.location.toJS().coords.latitude,
 					this.state.location.toJS().coords.longitude,
-					8);
+					17);
 			}
 		}
 	},
 
 	componentWillUpdate(nextProps, nextState) {
-		if(!this.state.currentEvent.get("lat") && nextState.currentEvent.get("lat")) {
+		if(this.state.currentEvent.get("lat") !== nextState.currentEvent.get("lat")) {
 			loadMap(React.findDOMNode(this.refs.map),
 				nextState.currentEvent.get("lat"),
 				nextState.currentEvent.get("lng"),
@@ -46,7 +46,7 @@ const App = React.createClass({
 			nextState.location) {
 			loadMap(React.findDOMNode(this.refs.map),
 				nextState.location.coords.latitude,
-				nextState.location.coords.longitude, 8);
+				nextState.location.coords.longitude, 17);
 		}
 	},
 
@@ -63,15 +63,19 @@ const App = React.createClass({
 
 function loadMap(el, lat, lng, zoom) {
 	GoogleMapsLoader.load((google) => {
+		el.style.position = "absolute";
+
 		let map = new google.maps.Map(el, {
 			center: {lat: lat, lng: lng},
 			scrollwheel: false,
 			zoom: zoom,
-			disableDefaultUI: true
+			disableDefaultUI: true,
+			draggable: false,
+			zoomControl: false,
+			disableDoubleClickZoom: true
 		});
 
 		google.maps.event.addListener(map, "tilesloaded", function(){
-			console.log("hi");
 			el.style.position = "fixed";
 		});
 	});
