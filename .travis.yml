@@ -8,4 +8,4 @@ before_script:
 script: gulp
 
 deploy:  
-	provider: azure_web_apps
+  provider: azure_web_apps
