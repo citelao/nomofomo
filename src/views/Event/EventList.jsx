@@ -24,7 +24,10 @@ const EventList = React.createClass({
 
 	render() {
 		return <div onClick={this.handleSwipe}>
-		<Event title={this.state.event.get("name")} />
+		<Event title={this.state.event.get("name")}
+			picture={this.state.event.get("picture")}
+			description={this.state.event.get("description")}
+			minAttendance={this.state.event.get("min_attendance")} />
 		</div>;
 	}
 });
