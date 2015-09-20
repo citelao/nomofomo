@@ -6,7 +6,7 @@ import actionTypes from '../../modules/events/actionTypes.js';
 
 import { getters, actions } from "../../modules/session";
 
-const EventConfirm = React.createClass({
+const EventCreateConfirm = React.createClass({
 	mixins: [reactor.ReactMixin, History],
 	getDataBindings() {
 		return {
@@ -22,4 +22,4 @@ const EventConfirm = React.createClass({
 	}
 });
 
-export default EventConfirm;
+export default EventCreateConfirm;
