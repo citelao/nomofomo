@@ -6,5 +6,13 @@ export default keyMirror({
    GET_EVENTS_FAILURE: null,
    CREATE_EVENTS_SUCCESS: null,
    CREATE_EVENTS_FAILURE: null,
-   SWIPE_EVENT: null
+   SWIPE_EVENT: null,
+
+   DECLINE_EVENT: null,
+   DECLINE_EVENT_SUCCESS: null,
+   DECLINE_EVENT_FAILURE: null,
+
+   INTEREST_EVENT: null,
+   INTEREST_EVENT_SUCCESS: null,
+   INTEREST_EVENT_FAILURE: null
 });

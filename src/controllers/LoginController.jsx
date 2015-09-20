@@ -14,7 +14,13 @@ const LoginController = React.createClass({
 	},
 
 	handleLogin() {
-		actions.login();
+		FB.getLoginStatus((response) => {
+			if(response.status === "connected") {
+				this.history.go(-1);
+			} else {
+				actions.login();
+			}
+		});
 	},
 
 	handleCancel() {

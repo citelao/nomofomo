@@ -15,7 +15,7 @@ const webpackOptions = {
 	},
 	resolve: {
 		root: path.resolve("./src"),
-		extensions: ['', '.js', '.jsx']
+		extensions: ["", ".js", ".jsx"]
 	},
 	module: {
 		loaders: [
@@ -62,4 +62,8 @@ gulp.task("serve", function(callback) {
 		// keep the server alive or continue?
 		// callback();
 	});
+});
+
+gulp.task("bootstrap", ["default"], function() {
+	gulp.src("./public/**/*.*").pipe(gulp.dest("dist"));
 });

@@ -1,7 +1,20 @@
 import { toImmutable } from "nuclear-js";
 
-export const events = ["events"];
+export const eventsMap = ["events"];
 
-export const currentEvent = [["events"], ["current"],
-	(events, current) => { return events.get(current) || toImmutable({}); }];
+export const events = [
+	eventsMap,
+	(map) => map.toList()
+];
 
+export const interested = [
+	["interested"],
+	(map) => map.toList()
+];
+
+
+export const currentEvent = [
+	events,
+	["current"],
+	(es, current) => { return es.get(current) || toImmutable({}); }
+];
