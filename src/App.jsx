@@ -54,7 +54,7 @@ const App = React.createClass({
 		return <div>
 			<div className="wrapper">
 				{this.props.children}
-				<Link to="/events/create" className="card card--bottom card--hover">Create Event</Link>
+				<Link to="/events/create" className="card card--hover">Create Event</Link>
 			</div>
 			<div className="map" ref="map"></div>
 		</div>;
