@@ -9,6 +9,7 @@ script: gulp
 
 deploy:  
   provider: azure_web_apps
+  verbose: true
 before_deploy:
   - mv dist/bundle.js public/bundle.js
   - rm -r dist
