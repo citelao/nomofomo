@@ -6,18 +6,3 @@ node_js:
 before_script:
   - npm install -g gulp
 script: gulp
-
-deploy:  
-  provider: azure_web_apps
-  verbose: true
-before_deploy:
-  - mv dist/bundle.js public/bundle.js
-  - rm -r dist
-  - rm -r node_modules
-  - rm -r src
-  - rm package.json
-  - rm gulpfile.babel.js
-  - rm .eslintrc
-  - rm .travis.yml
-  - mv public/* ./
-  - rm -r public
