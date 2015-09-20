@@ -58,27 +58,35 @@
 
 	var _App2 = _interopRequireDefault(_App);
 
-	var _controllersPitch = __webpack_require__(223);
+	var _controllersPitch = __webpack_require__(224);
 
 	var _controllersPitch2 = _interopRequireDefault(_controllersPitch);
 
-	var _controllersEventsView = __webpack_require__(224);
+	var _controllersEventsView = __webpack_require__(225);
 
 	var _controllersEventsView2 = _interopRequireDefault(_controllersEventsView);
 
-	var _controllersEventEventView = __webpack_require__(226);
+	var _controllersEventEventView = __webpack_require__(227);
 
 	var _controllersEventEventView2 = _interopRequireDefault(_controllersEventEventView);
 
-	var _controllersEventEventCreate = __webpack_require__(227);
+	var _controllersEventEventConfirm = __webpack_require__(228);
+
+	var _controllersEventEventConfirm2 = _interopRequireDefault(_controllersEventEventConfirm);
+
+	var _controllersEventEventCreate = __webpack_require__(229);
 
 	var _controllersEventEventCreate2 = _interopRequireDefault(_controllersEventEventCreate);
 
-	var _controllersEventEventList = __webpack_require__(228);
+	var _controllersEventEventCreateConfirm = __webpack_require__(230);
+
+	var _controllersEventEventCreateConfirm2 = _interopRequireDefault(_controllersEventEventCreateConfirm);
+
+	var _controllersEventEventList = __webpack_require__(231);
 
 	var _controllersEventEventList2 = _interopRequireDefault(_controllersEventEventList);
 
-	var _controllersLoginController = __webpack_require__(230);
+	var _controllersLoginController = __webpack_require__(233);
 
 	var _controllersLoginController2 = _interopRequireDefault(_controllersLoginController);
 
@@ -101,6 +109,8 @@
 					{ path: "events", component: _controllersEventsView2["default"] },
 					_react2["default"].createElement(_reactRouter.IndexRoute, { component: _controllersEventEventList2["default"] }),
 					_react2["default"].createElement(_reactRouter.Route, { path: "create", component: _controllersEventEventCreate2["default"] }),
+					_react2["default"].createElement(_reactRouter.Route, { path: "confirm", component: _controllersEventEventCreateConfirm2["default"] }),
+					_react2["default"].createElement(_reactRouter.Route, { path: "confirm/:id", component: _controllersEventEventConfirm2["default"] }),
 					_react2["default"].createElement(_reactRouter.Route, { path: ":id", component: _controllersEventEventView2["default"] })
 				),
 				_react2["default"].createElement(_reactRouter.Route, { path: "login", component: _controllersLoginController2["default"] })
@@ -31458,12 +31468,13 @@
 	_reactor2["default"].registerStores({
 		events: __webpack_require__(217),
 		interested: __webpack_require__(219),
-		current: __webpack_require__(220)
+		current: __webpack_require__(220),
+		newEvent: __webpack_require__(221)
 	});
 
 	exports["default"] = {
-		actions: __webpack_require__(221),
-		getters: __webpack_require__(222)
+		actions: __webpack_require__(222),
+		getters: __webpack_require__(223)
 	};
 	module.exports = exports["default"];
 
@@ -31535,6 +31546,11 @@
 	   GET_EVENTS: null,
 	   GET_EVENTS_SUCCESS: null,
 	   GET_EVENTS_FAILURE: null,
+
+	   CREATE_EVENT: null,
+	   CREATE_EVENT_SUCCESS: null,
+	   CREATE_EVENT_FAILURE: null,
+	   SWIPE_EVENT: null,
 
 	   DECLINE_EVENT: null,
 	   DECLINE_EVENT_SUCCESS: null,
@@ -31623,7 +31639,7 @@
 
 		initialize: function initialize() {
 			this.on(_actionTypes2["default"].GET_EVENTS_SUCCESS, resetCurrent);
-			this.on(_actionTypes2["default"].SWIPE_EVENT, incrementCurrent);
+			this.on(_actionTypes2["default"].INTEREST_EVENT, incrementCurrent);
 		}
 	});
 
@@ -31645,9 +31661,45 @@
 	Object.defineProperty(exports, "__esModule", {
 		value: true
 	});
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+
+	var _nuclearJs = __webpack_require__(203);
+
+	var _actionTypes = __webpack_require__(218);
+
+	var _actionTypes2 = _interopRequireDefault(_actionTypes);
+
+	exports["default"] = new _nuclearJs.Store({
+		getInitialState: function getInitialState() {
+			return (0, _nuclearJs.toImmutable)({});
+		},
+
+		initialize: function initialize() {
+			this.on(_actionTypes2["default"].CREATE_EVENT_SUCCESS, setEvent);
+		}
+	});
+
+	function setEvent(old, _ref) {
+		var event = _ref.event;
+
+		return event;
+	}
+	module.exports = exports["default"];
+
+/***/ },
+/* 222 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
 	exports.getEvents = getEvents;
 	exports.declineEvent = declineEvent;
 	exports.interestEvent = interestEvent;
+	exports.createEvent = createEvent;
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 
@@ -31715,8 +31767,30 @@
 		});
 	}
 
+	function createEvent(userId, name, location, description, startTime, duration, minAttendance) {
+		var now = new Date();
+		var startOfDayTimestamp = new Date(now.getFullYear(), now.getMonth(), now.getDate()) / 1000;
+		var eventStartTime = startOfDayTimestamp + Number(startTime.split(":")[0]) * 60 * 60 + Number(startTime.split(":")[1]) * 60;
+		_qwest2["default"].post("http://whispering-sea-1365.herokuapp.com/events", {
+			creator_id: userId,
+			name: name,
+			description: description,
+			lat: 43.471856,
+			lng: -80.538886,
+			loc: location,
+			min_attendance: minAttendance,
+			start_time: eventStartTime,
+			duration: duration
+		}).then(function (xhr, result) {
+			var events = JSON.parse(result);
+			_reactor2["default"].dispatch(_actionTypes2["default"].CREATE_EVENT_SUCCESS, { events: events });
+		}, function (error) {
+			_reactor2["default"].dispatch(_actionTypes2["default"].CREATE_EVENT_FAILURE, { error: error });
+		});
+	}
+
 /***/ },
-/* 222 */
+/* 223 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -31743,10 +31817,13 @@
 	var currentEvent = [events, ["current"], function (es, current) {
 		return es.get(current) || (0, _nuclearJs.toImmutable)({});
 	}];
+
 	exports.currentEvent = currentEvent;
+	var newEvent = [["newEvent"]];
+	exports.newEvent = newEvent;
 
 /***/ },
-/* 223 */
+/* 224 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -31807,7 +31884,7 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 224 */
+/* 225 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -31832,7 +31909,7 @@
 
 	// import { Link } from "react-router";
 
-	var _componentsEvent = __webpack_require__(225);
+	var _componentsEvent = __webpack_require__(226);
 
 	var _componentsEvent2 = _interopRequireDefault(_componentsEvent);
 
@@ -31863,7 +31940,7 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 225 */
+/* 226 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -31972,7 +32049,7 @@
 	/*<div ref="map" style={{height: 250, width: "100%"}}></div>*/
 
 /***/ },
-/* 226 */
+/* 227 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -32061,6 +32138,7 @@
 					{ className: "button button--good",
 						onClick: function () {
 							_modulesEvents.actions.interestEvent(_this.props.params.id, _this.state.userId);
+							_this.history.pushState(null, "events/confirm/" + current.get("id"));
 						} },
 					"I'm interested!"
 				)
@@ -32069,117 +32147,6 @@
 	});
 
 	exports["default"] = EventView;
-	module.exports = exports["default"];
-
-/***/ },
-/* 227 */
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-
-	Object.defineProperty(exports, "__esModule", {
-		value: true
-	});
-
-	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
-
-	var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; desc = parent = getter = undefined; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; continue _function; } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
-
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
-
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-	var _react = __webpack_require__(1);
-
-	var _react2 = _interopRequireDefault(_react);
-
-	var EventCreate = (function (_React$Component) {
-		_inherits(EventCreate, _React$Component);
-
-		function EventCreate() {
-			_classCallCheck(this, EventCreate);
-
-			_get(Object.getPrototypeOf(EventCreate.prototype), "constructor", this).apply(this, arguments);
-		}
-
-		_createClass(EventCreate, [{
-			key: "render",
-			value: function render() {
-				return _react2["default"].createElement(
-					"div",
-					{ className: "card card--overlay" },
-					_react2["default"].createElement(
-						"label",
-						{ htmlFor: "create_name" },
-						"Event Name",
-						_react2["default"].createElement("input", { type: "text", id: "create_name" })
-					),
-					_react2["default"].createElement("br", null),
-					_react2["default"].createElement(
-						"label",
-						{ htmlFor: "create_location" },
-						"Event location",
-						_react2["default"].createElement("input", { type: "text", id: "create_location" })
-					),
-					_react2["default"].createElement("br", null),
-					_react2["default"].createElement(
-						"label",
-						{ htmlFor: "create_description" },
-						"Event description",
-						_react2["default"].createElement("input", { type: "text", id: "create_description" })
-					),
-					_react2["default"].createElement("br", null),
-					_react2["default"].createElement(
-						"table",
-						null,
-						_react2["default"].createElement(
-							"tr",
-							null,
-							_react2["default"].createElement(
-								"td",
-								{ className: "third-width" },
-								_react2["default"].createElement(
-									"label",
-									{ htmlFor: "create_time" },
-									"Event time",
-									_react2["default"].createElement("input", { type: "time", id: "create_time" })
-								)
-							),
-							_react2["default"].createElement(
-								"td",
-								{ className: "third-width" },
-								_react2["default"].createElement(
-									"label",
-									{ htmlFor: "create_duration" },
-									"Event duration (hours)",
-									_react2["default"].createElement("input", { type: "text", id: "create_duration", placeholder: "1" })
-								)
-							),
-							_react2["default"].createElement(
-								"td",
-								{ className: "third-width" },
-								_react2["default"].createElement(
-									"label",
-									{ htmlFor: "min_duration" },
-									"Minimum attendance",
-									_react2["default"].createElement("input", { type: "text", id: "min_duration", placeholder: "3" })
-								)
-							)
-						)
-					),
-					_react2["default"].createElement("br", null),
-					_react2["default"].createElement("input", { type: "submit", value: "Create!" }),
-					this.props.children
-				);
-			}
-		}]);
-
-		return EventCreate;
-	})(_react2["default"].Component);
-
-	exports["default"] = EventCreate;
 	module.exports = exports["default"];
 
 /***/ },
@@ -32204,11 +32171,296 @@
 
 	var _reactor2 = _interopRequireDefault(_reactor);
 
-	var _componentsEvent = __webpack_require__(225);
+	var _modulesSession = __webpack_require__(204);
+
+	var _modulesEvents = __webpack_require__(216);
+
+	var EventConfirm = _react2["default"].createClass({
+		displayName: "EventConfirm",
+
+		mixins: [_reactor2["default"].ReactMixin, _reactRouter.History],
+
+		getDataBindings: function getDataBindings() {
+			return {
+				userId: _modulesSession.getters.userId,
+				eventsMap: _modulesEvents.getters.eventsMap
+			};
+		},
+
+		componentDidMount: function componentDidMount() {
+			if (!this.state.userId) {
+				this.history.pushState(null, "/login");
+			}
+		},
+
+		render: function render() {
+			var _this = this;
+
+			var current = this.state.eventsMap.get(this.props.params.id.toString());
+
+			if (!current) {
+				return _react2["default"].createElement("div", null);
+			}
+
+			return _react2["default"].createElement(
+				"div",
+				{ className: "card" },
+				_react2["default"].createElement(
+					"h1",
+					null,
+					"You're going to ",
+					current.get("name"),
+					"!"
+				),
+				_react2["default"].createElement(
+					"h2",
+					null,
+					current.get("address")
+				),
+				_react2["default"].createElement(
+					"p",
+					null,
+					"here are pictures of people"
+				),
+				_react2["default"].createElement(
+					"p",
+					null,
+					current.get("description")
+				),
+				_react2["default"].createElement(
+					"button",
+					{ className: "button button--text",
+						onClick: function () {
+							_this.history.go(-1);
+						} },
+					"Back"
+				)
+			);
+		}
+	});
+
+	exports["default"] = EventConfirm;
+	module.exports = exports["default"];
+
+/***/ },
+/* 229 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+
+	var _react = __webpack_require__(1);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	var _qwest = __webpack_require__(209);
+
+	var _qwest2 = _interopRequireDefault(_qwest);
+
+	var _reactRouter = __webpack_require__(157);
+
+	var _reactor = __webpack_require__(202);
+
+	var _reactor2 = _interopRequireDefault(_reactor);
+
+	var _modulesEventsActionTypesJs = __webpack_require__(218);
+
+	var _modulesEventsActionTypesJs2 = _interopRequireDefault(_modulesEventsActionTypesJs);
+
+	var _modulesSession = __webpack_require__(204);
+
+	var _modulesEvents = __webpack_require__(216);
+
+	var EventCreate = _react2["default"].createClass({
+		displayName: "EventCreate",
+
+		mixins: [_reactor2["default"].ReactMixin, _reactRouter.History],
+		getDataBindings: function getDataBindings() {
+			return {
+				user: _modulesSession.getters.userId
+			};
+		},
+
+		handleSubmit: function handleSubmit(e) {
+			var name = _react2["default"].findDOMNode(e.target).elements[0].value;
+			var location = _react2["default"].findDOMNode(e.target).elements[1].value;
+			var description = _react2["default"].findDOMNode(e.target).elements[2].value;
+			var startTime = _react2["default"].findDOMNode(e.target).elements[3].value;
+			var duration = 60 * 60 * Number(_react2["default"].findDOMNode(e.target).elements[4].value);
+			var minAttendance = _react2["default"].findDOMNode(e.target).elements[5].value;
+
+			_modulesEvents.actions.createEvent(this.state.user, name, location, description, startTime, duration, minAttendance);
+			this.history.pushState(null, "/events/confirm");
+		},
+
+		render: function render() {
+			return _react2["default"].createElement(
+				"div",
+				{ className: "card card--overlay" },
+				_react2["default"].createElement(
+					"form",
+					{ className: "formElem", onSubmit: this.handleSubmit },
+					_react2["default"].createElement(
+						"label",
+						{ htmlFor: "create_name" },
+						"Event Name",
+						_react2["default"].createElement("input", { type: "text", id: "create_name", name: "create_name", ref: "create_name" })
+					),
+					_react2["default"].createElement("br", null),
+					_react2["default"].createElement(
+						"label",
+						{ htmlFor: "create_location" },
+						"Event location",
+						_react2["default"].createElement("input", { type: "text", id: "create_location", name: "create_location", ref: "create_location" })
+					),
+					_react2["default"].createElement("br", null),
+					_react2["default"].createElement(
+						"label",
+						{ htmlFor: "create_description" },
+						"Event description",
+						_react2["default"].createElement("input", { type: "text", id: "create_description", name: "create_description", ref: "create_description" })
+					),
+					_react2["default"].createElement("br", null),
+					_react2["default"].createElement(
+						"table",
+						null,
+						_react2["default"].createElement(
+							"tr",
+							null,
+							_react2["default"].createElement(
+								"td",
+								{ className: "third-width" },
+								_react2["default"].createElement(
+									"label",
+									{ htmlFor: "create_time" },
+									"Event time",
+									_react2["default"].createElement("input", { type: "time", id: "create_time", name: "create_time", ref: "create_time" })
+								)
+							),
+							_react2["default"].createElement(
+								"td",
+								{ className: "third-width" },
+								_react2["default"].createElement(
+									"label",
+									{ htmlFor: "create_duration" },
+									"Event duration (hours)",
+									_react2["default"].createElement("input", { type: "text", id: "create_duration", name: "create_duration", ref: "create_duration", placeholder: "1" })
+								)
+							),
+							_react2["default"].createElement(
+								"td",
+								{ className: "third-width" },
+								_react2["default"].createElement(
+									"label",
+									{ htmlFor: "min_attendance" },
+									"Minimum attendance",
+									_react2["default"].createElement("input", { type: "text", id: "min_attendance", name: "min_attendance", ref: "min_attendance", placeholder: "3" })
+								)
+							)
+						)
+					),
+					_react2["default"].createElement("br", null),
+					_react2["default"].createElement("input", { type: "submit", value: "Create!" })
+				),
+				this.props.children
+			);
+		}
+	});
+
+	exports["default"] = EventCreate;
+	module.exports = exports["default"];
+
+/***/ },
+/* 230 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+
+	var _react = __webpack_require__(1);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	var _reactRouter = __webpack_require__(157);
+
+	var _reactor = __webpack_require__(202);
+
+	var _reactor2 = _interopRequireDefault(_reactor);
+
+	var _modulesEventsActionTypesJs = __webpack_require__(218);
+
+	var _modulesEventsActionTypesJs2 = _interopRequireDefault(_modulesEventsActionTypesJs);
+
+	var _modulesSession = __webpack_require__(204);
+
+	var EventCreateConfirm = _react2["default"].createClass({
+		displayName: "EventCreateConfirm",
+
+		mixins: [_reactor2["default"].ReactMixin, _reactRouter.History],
+		getDataBindings: function getDataBindings() {
+			return {
+				user: _modulesSession.getters.userId
+			};
+		},
+
+		render: function render() {
+			return _react2["default"].createElement(
+				"div",
+				{ className: "card" },
+				_react2["default"].createElement(
+					"h1",
+					null,
+					"You've scheduled a new activity!"
+				),
+				_react2["default"].createElement(
+					"h2",
+					null,
+					"Now comes the waiting game..."
+				)
+			);
+		}
+	});
+
+	exports["default"] = EventCreateConfirm;
+	module.exports = exports["default"];
+
+/***/ },
+/* 231 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+
+	var _react = __webpack_require__(1);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	var _reactRouter = __webpack_require__(157);
+
+	var _reactor = __webpack_require__(202);
+
+	var _reactor2 = _interopRequireDefault(_reactor);
+
+	var _componentsEvent = __webpack_require__(226);
 
 	var _componentsEvent2 = _interopRequireDefault(_componentsEvent);
 
-	var _componentsInterested = __webpack_require__(229);
+	var _componentsInterested = __webpack_require__(232);
 
 	var _componentsInterested2 = _interopRequireDefault(_componentsInterested);
 
@@ -32273,7 +32525,7 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 229 */
+/* 232 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -32333,7 +32585,7 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 230 */
+/* 233 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
