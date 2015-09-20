@@ -33,7 +33,7 @@ const EventView = React.createClass({
 				logistics here
 			</p>
 
-			<p onClick={() => { actions.interestEvent(1, this.state.userId)}}> a biggg confirm button</p>
+			<p onClick={() => { actions.interestEvent(this.props.params.id, this.state.userId)}}> a biggg confirm button</p>
 		</div>;
 	}
 });
