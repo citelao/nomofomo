@@ -15,6 +15,8 @@ export default class Event extends React.Component {
 			<br />
 			{users}
 			<p>{this.props.description}</p>
+			<button onClick={this.props.onDecline}>Decline</button>
+			<button onClick={this.props.onInterested}>Interested!</button>
 		</div>;
 	}
 }
