@@ -28,7 +28,7 @@ export default class Event extends React.Component {
 		return <div className="card">
 			<h1>{this.props.title}</h1>
 			<h2>{this.props.address}</h2>
-			<img src={this.props.picture} alt="a placeholder image"/>
+			{(this.props.picture) ? <img src={this.props.picture} alt="a placeholder image"/> : null}
 			<br />
 			{/*<div ref="map" style={{height: 250, width: "100%"}}></div>*/}
 			{users}

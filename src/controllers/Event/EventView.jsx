@@ -24,7 +24,9 @@ const EventView = React.createClass({
 	render() {
 		let current = this.state.eventsMap.get(this.props.params.id.toString());
 
-		console.log(current);
+		if(!current) {
+			return <div></div>;
+		}
 
 		return <div className="card">
 			<h1>Confirm your interest in {current.get("name")}</h1>
@@ -38,8 +40,15 @@ const EventView = React.createClass({
 				logistics here
 			</p>
 
+			<button className="button button--text"
+				onClick={() => { this.history.go(-1); }}>
+				Back
+			</button>
+
 			<button className="button button--good"
-				onClick={() => { actions.interestEvent(this.props.params.id, this.state.userId)}}>I'm interested!</button>
+				onClick={() => { actions.interestEvent(this.props.params.id, this.state.userId)}}>
+				I'm interested!
+			</button>
 		</div>;
 	}
 });
