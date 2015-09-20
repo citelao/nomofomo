@@ -5,7 +5,9 @@ import App from "App";
 import Pitch from "controllers/Pitch";
 import EventsView from "controllers/EventsView";
 import EventView from "controllers/Event/EventView";
+import EventConfirm from "controllers/Event/EventConfirm";
 import EventCreate from "controllers/Event/EventCreate";
+import EventCreateConfirm from "controllers/Event/EventCreateConfirm";
 import EventList from "controllers/Event/EventList";
 import LoginController from "controllers/LoginController";
 
@@ -23,6 +25,8 @@ document.addEventListener("fb_init", function() {
 				<Route path="events" component={EventsView}>
 					<IndexRoute component={EventList} />
 					<Route path="create" component={EventCreate} />
+					<Route path="confirm" component={EventCreateConfirm} />
+					<Route path="confirm/:id" component={EventConfirm} />
 					<Route path=":id" component={EventView} />
 				</Route>
 

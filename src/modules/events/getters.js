@@ -12,9 +12,12 @@ export const interested = [
 	(map) => map.toList()
 ];
 
-
 export const currentEvent = [
 	events,
 	["current"],
 	(es, current) => { return es.get(current) || toImmutable({}); }
+];
+
+export const newEvent = [
+	["newEvent"]
 ];

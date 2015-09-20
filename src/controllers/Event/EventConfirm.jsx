@@ -5,7 +5,7 @@ import reactor from "../../reactor";
 import { getters } from "../../modules/session";
 import { getters as eventsGetters, actions } from "../../modules/events";
 
-const EventView = React.createClass({
+const EventConfirm = React.createClass({
 	mixins: [reactor.ReactMixin, History],
 
 	getDataBindings() {
@@ -29,7 +29,7 @@ const EventView = React.createClass({
 		}
 
 		return <div className="card">
-			<h1>Confirm your interest in {current.get("name")}</h1>
+			<h1>You&#39;re going to {current.get("name")}!</h1>
 			<h2>{current.get("address")}</h2>
 
 			<p>
@@ -37,23 +37,15 @@ const EventView = React.createClass({
 			</p>
 
 			<p>
-				logistics here
+				{current.get("description")}
 			</p>
 
 			<button className="button button--text"
 				onClick={() => { this.history.go(-1); }}>
 				Back
 			</button>
-
-			<button className="button button--good"
-				onClick={() => {
-					actions.interestEvent(this.props.params.id, this.state.userId);
-					this.history.pushState(null, `events/confirm/${current.get("id")}`);
-				}}>
-				I'm interested!
-			</button>
 		</div>;
 	}
 });
 
-export default EventView;
+export default EventConfirm;
