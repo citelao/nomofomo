@@ -32,6 +32,25 @@ export function declineEvent(eventId, userId) {
 	qwest.post(apiURL + "/events/" + eventId + "/rejected/" + userId).then((xhr, result) => {
 		reactor.dispatch(actionTypes.DECLINE_EVENT_SUCCESS, { id: eventId });
 	}, (error) => {
-		reactor.dispatch(actionTypes.DECLINE_EVENT_FAILURE, { id: eventId });
+		reactor.dispatch(actionTypes.DECLINE_EVENT_FAILURE, { id: eventId, error });
 	});
+}
+
+
+export function interestEvent(eventId, userId) {
+	if(!eventId) {
+		throw new TypeError("no event");
+	}
+
+	if(!userId) {
+		throw new TypeError("no user");
+	}
+
+	reactor.dispatch(actionTypes.INTEREST_EVENT, { id: eventId });
+
+	qwest.post(apiURL + "/events/" + eventId + "/interested/" + userId).then((xhr, result) => {
+		reactor.dispatch(actionTypes.INTEREST_EVENT_SUCCESS, { id: eventId });
+	}, (error) => {
+		reactor.dispatch(actionTypes.INTEREST_EVENT_FAILURE, { id: eventId, error });
+	});	
 }

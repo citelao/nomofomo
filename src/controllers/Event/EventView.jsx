@@ -3,13 +3,14 @@ import { History } from "react-router";
 
 import reactor from "../../reactor";
 import { getters } from "../../modules/session";
+import { getters as eventsGetters, actions } from "../../modules/events";
 
 const EventView = React.createClass({
 	mixins: [reactor.ReactMixin, History],
 
 	getDataBindings() {
 		return {
-			userId: getters.userId
+			userId: getters.userId,
 		};
 	},
 
@@ -20,9 +21,19 @@ const EventView = React.createClass({
 	},
 
 	render() {
-		return <div>
-			A single event!
-			{this.props.children}
+		return <div className="card">
+			<h1>you are interested in something!</h1>
+			<h2>so proud</h2>
+
+			<p>
+				here are pictures of people
+			</p>
+
+			<p>
+				logistics here
+			</p>
+
+			<p onClick={() => { actions.interestEvent(1, this.state.userId)}}> a biggg confirm button</p>
 		</div>;
 	}
 });

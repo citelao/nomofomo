@@ -7,5 +7,9 @@ export default keyMirror({
 
    DECLINE_EVENT: null,
    DECLINE_EVENT_SUCCESS: null,
-   DECLINE_EVENT_FAILURE: null
+   DECLINE_EVENT_FAILURE: null,
+
+   INTEREST_EVENT: null,
+   INTEREST_EVENT_SUCCESS: null,
+   INTEREST_EVENT_FAILURE: null
 });

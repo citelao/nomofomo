@@ -29,6 +29,7 @@ export default class Event extends React.Component {
 			<h1>{this.props.title}</h1>
 			<h2>{this.props.address}</h2>
 			<img src={this.props.picture} alt="a placeholder image"/>
+			<br />
 			{/*<div ref="map" style={{height: 250, width: "100%"}}></div>*/}
 			{users}
 			<p>{this.props.description}</p>
