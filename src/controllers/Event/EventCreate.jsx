@@ -25,8 +25,10 @@ const EventCreate = React.createClass({
 		var startTime = React.findDOMNode(e.target).elements[3].value;
 		var duration = 60 * 60 * Number(React.findDOMNode(e.target).elements[4].value);
 		var minAttendance = React.findDOMNode(e.target).elements[5].value;
+		
 		eventActions.createEvent(this.state.user, name, location, description, startTime, duration, minAttendance);
 		this.history.pushState(null, "/events/confirm");
+
     },
 
 	render() {
