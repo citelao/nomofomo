@@ -1,10 +1,12 @@
 import React from "react";
 import qwest from "qwest";
+import { History } from "react-router";
+
 import reactor from "../../reactor";
 import actionTypes from '../../modules/events/actionTypes.js';
-import { History } from "react-router";
-import { getters, actions } from "../../modules/session";
 
+import { getters, actions } from "../../modules/session";
+import { actions as eventActions } from "../../modules/events";
 
 const EventCreate = React.createClass({
 	
@@ -17,28 +19,14 @@ const EventCreate = React.createClass({
 
 
 	handleSubmit(e) {
-		console.log(this.state.user);
-		alert('asdf');
 		var name = React.findDOMNode(e.target).elements[0].value;
 		var location = React.findDOMNode(e.target).elements[1].value;
 		var description = React.findDOMNode(e.target).elements[2].value;
 		var startTime = React.findDOMNode(e.target).elements[3].value;
 		var duration = 60 * 60 * Number(React.findDOMNode(e.target).elements[4].value);
 		var minAttendance = React.findDOMNode(e.target).elements[5].value;
-		var now = new Date();
-		var startOfDayTimestamp = new Date(now.getFullYear(), now.getMonth(), now.getDate()) / 1000;
-		var eventStartTime = startOfDayTimestamp + Number(startTime.split(":")[0]) * 60 * 60 + Number(startTime.split(":")[1]) * 60;
-		var params = "?creator_id=" + this.state.user + "&name=" + name + "&description=" + description + "&lat=43.471856&lng=-80.538886" +
-		"&loc=" + location + "&min_attendance=" + minAttendance + "&start_time=" + eventStartTime + "&duration=" + duration;
-		console.log(name + ',' + location + ',' + description + ',' + startTime + ',' + duration + ',' + minAttendance);
-		alert(params);
-		qwest.post("http://whispering-sea-1365.herokuapp.com/events" + params).then((xhr, result) => {
-			let events = JSON.parse(result);
-			alert(events);
-			reactor.dispatch(actionTypes.CREATE_EVENTS_SUCCESS, { events });
-		}, (error) => {
-			reactor.dispatch(actionTypes.CREATE_EVENTS_FAILURE, { error });
-		});
+		eventActions.createEvent(this.state.user, name, location, description, startTime, duration, minAttendance);
+		this.history.pushState(null, "/events/confirm");
     },
 
 	render() {

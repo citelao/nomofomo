@@ -54,3 +54,25 @@ export function interestEvent(eventId, userId) {
 		reactor.dispatch(actionTypes.INTEREST_EVENT_FAILURE, { id: eventId, error });
 	});	
 }
+
+export function createEvent(userId, name, location, description, startTime, duration, minAttendance) {
+	var now = new Date();
+	var startOfDayTimestamp = new Date(now.getFullYear(), now.getMonth(), now.getDate()) / 1000;
+	var eventStartTime = startOfDayTimestamp + Number(startTime.split(":")[0]) * 60 * 60 + Number(startTime.split(":")[1]) * 60;
+	qwest.post("http://whispering-sea-1365.herokuapp.com/events", {
+		creator_id: userId,
+		name: name,
+		description: description,
+		lat: 43.471856,
+		lng: -80.538886,
+		loc: location,
+		min_attendance: minAttendance,
+		start_time: eventStartTime,
+		duration: duration
+	}).then((xhr, result) => {
+		let events = JSON.parse(result);
+		reactor.dispatch(actionTypes.CREATE_EVENT_SUCCESS, { events });
+	}, (error) => {
+		reactor.dispatch(actionTypes.CREATE_EVENT_FAILURE, { error });
+	});
+}

@@ -3,7 +3,8 @@ import reactor from "../../reactor";
 reactor.registerStores({
 	events: require("./stores/eventsStore.js"),
 	interested: require("./stores/interestedStore.js"),
-	current: require("./stores/currentEventStore.js")
+	current: require("./stores/currentEventStore.js"),
+	newEvent: require("./stores/newEventStore.js")
 });
 
 export default {

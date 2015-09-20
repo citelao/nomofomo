@@ -46,7 +46,10 @@ const EventView = React.createClass({
 			</button>
 
 			<button className="button button--good"
-				onClick={() => { actions.interestEvent(this.props.params.id, this.state.userId)}}>
+				onClick={() => { 
+					actions.interestEvent(this.props.params.id, this.state.userId);
+					this.history.pushState(null, "/events");
+				}}>
 				I'm interested!
 			</button>
 		</div>;
