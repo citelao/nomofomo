@@ -28,7 +28,7 @@ export function login() {
 	}
 }
 
-export function getLoginStatus() {
+export function fetchLogin() {
 	reactor.dispatch(actionTypes.GET_LOGIN, {});
 
 	if(FB) {

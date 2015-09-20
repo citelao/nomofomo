@@ -4,19 +4,21 @@ import { History } from "react-router";
 import reactor from "../../reactor";
 import Event from "../../components/event";
 
-import { getters, actions } from "../../modules/events";
+import { getters as eventsGetters, actions } from "../../modules/events";
+import { getters as sessionGetters } from "../../modules/session";
 
 const EventList = React.createClass({
 	mixins: [reactor.ReactMixin, History],
 
 	getDataBindings() {
 		return {
-			event: getters.currentEvent
+			event: eventsGetters.currentEvent,
+			userId: sessionGetters.userId
 		};
 	},
 
 	componentWillMount() {
-		actions.getEvents();
+		actions.getEvents(this.state.userId);
 	},
 
 	handleDecline() {

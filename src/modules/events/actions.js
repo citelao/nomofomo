@@ -4,10 +4,12 @@ import { apiURL } from "../../constants";
 import reactor from "../../reactor";
 import actionTypes from "./actionTypes";
 
-export function getEvents() {
+export function getEvents(user) {
 	reactor.dispatch(actionTypes.GET_EVENTS, {});
 
-	qwest.get(apiURL + "/events").then((xhr, result) => {
+	let narrow = (user) ? "/1" : "";
+
+	qwest.get(apiURL + "/events" + narrow).then((xhr, result) => {
 		let events = JSON.parse(result);
 		
 		reactor.dispatch(actionTypes.GET_EVENTS_SUCCESS, { events });
