@@ -13,11 +13,14 @@ export default new Store({
 	}
 });
 
-function updateEvents(state, { events }) {
+function updateEvents(state, { events, user }) {
 	let newState = {};
 	for (var i = events.length - 1; i >= 0; i--) {
 		let evt = events[i];
-		newState[evt.id] = evt;
+
+		if(evt.interested_users.indexOf(user) !== -1) {
+			newState[evt.id] = evt;
+		}
 	}
 
 	return toImmutable(newState);

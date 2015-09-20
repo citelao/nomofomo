@@ -13,22 +13,24 @@ import { actions } from "modules/session";
 
 actions.getLocation();
 
-document.addEventListener("fb_init", actions.getLoginStatus);
+document.addEventListener("fb_init", function() {
+	actions.fetchLogin();
 
-React.render(
-	(<Router>
-		<Route path="/" component={App}>
-			<IndexRoute component={Pitch} />
-			<Route path="events" component={EventsView}>
-				<IndexRoute component={EventList} />
-				<Route path="create" component={EventCreate} />
-				<Route path=":id" component={EventView} />
+	React.render(
+		(<Router>
+			<Route path="/" component={App}>
+				<IndexRoute component={Pitch} />
+				<Route path="events" component={EventsView}>
+					<IndexRoute component={EventList} />
+					<Route path="create" component={EventCreate} />
+					<Route path=":id" component={EventView} />
+				</Route>
+
+				<Route path="login" component={LoginController} />
 			</Route>
 
-			<Route path="login" component={LoginController} />
-		</Route>
-
-		<Route path="*" component={App} />{/* better 404 eventually */}
-	</Router>),
-	document.getElementById("entry")
-);
+			<Route path="*" component={App} />{/* better 404 eventually */}
+		</Router>),
+		document.getElementById("entry")
+	);
+});

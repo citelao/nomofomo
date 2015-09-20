@@ -24,7 +24,7 @@ const App = React.createClass({
 				this.state.currentEvent.get("lng"),
 				15);
 		} else {
-			if(this.state.location) {
+			if(this.state.location && this.state.location.toJS) {
 				loadMap(React.findDOMNode(this.refs.map),
 					this.state.location.toJS().coords.latitude,
 					this.state.location.toJS().coords.longitude,
@@ -66,7 +66,7 @@ function loadMap(el, lat, lng, zoom) {
 		el.style.position = "absolute";
 
 		let map = new google.maps.Map(el, {
-			center: {lat: lat, lng: lng},
+			center: {lat: parseFloat(lat), lng: parseFloat(lng)},
 			scrollwheel: false,
 			zoom: zoom,
 			disableDefaultUI: true,
