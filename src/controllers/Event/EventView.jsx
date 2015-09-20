@@ -11,6 +11,7 @@ const EventView = React.createClass({
 	getDataBindings() {
 		return {
 			userId: getters.userId,
+			eventsMap: eventsGetters.eventsMap
 		};
 	},
 
@@ -21,9 +22,13 @@ const EventView = React.createClass({
 	},
 
 	render() {
+		let current = this.state.eventsMap.get(this.props.params.id.toString());
+
+		console.log(current);
+
 		return <div className="card">
-			<h1>you are interested in something!</h1>
-			<h2>so proud</h2>
+			<h1>Confirm your interest in {current.get("name")}</h1>
+			<h2>{current.get("address")}</h2>
 
 			<p>
 				here are pictures of people
@@ -33,7 +38,8 @@ const EventView = React.createClass({
 				logistics here
 			</p>
 
-			<p onClick={() => { actions.interestEvent(this.props.params.id, this.state.userId)}}> a biggg confirm button</p>
+			<button className="button button--good"
+				onClick={() => { actions.interestEvent(this.props.params.id, this.state.userId)}}>I'm interested!</button>
 		</div>;
 	}
 });

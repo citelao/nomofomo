@@ -66,7 +66,7 @@ function loadMap(el, lat, lng, zoom) {
 		el.style.position = "absolute";
 
 		let map = new google.maps.Map(el, {
-			center: {lat: lat, lng: lng},
+			center: {lat: parseFloat(lat), lng: parseFloat(lng)},
 			scrollwheel: false,
 			zoom: zoom,
 			disableDefaultUI: true,
