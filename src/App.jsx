@@ -63,11 +63,16 @@ const App = React.createClass({
 
 function loadMap(el, lat, lng, zoom) {
 	GoogleMapsLoader.load((google) => {
-		new google.maps.Map(el, {
+		let map = new google.maps.Map(el, {
 			center: {lat: lat, lng: lng},
 			scrollwheel: false,
 			zoom: zoom,
 			disableDefaultUI: true
+		});
+
+		google.maps.event.addListener(map, "tilesloaded", function(){
+			console.log("hi");
+			el.style.position = "fixed";
 		});
 	});
 }

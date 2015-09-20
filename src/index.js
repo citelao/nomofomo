@@ -13,7 +13,7 @@ import { actions } from "modules/session";
 
 actions.getLocation();
 
-document.addEventListener("fb_init", function() { console.log("hi"); actions.getLoginStatus(); });
+document.addEventListener("fb_init", actions.getLoginStatus);
 
 React.render(
 	(<Router>
