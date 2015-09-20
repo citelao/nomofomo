@@ -58,27 +58,27 @@
 
 	var _App2 = _interopRequireDefault(_App);
 
-	var _controllersPitch = __webpack_require__(222);
+	var _controllersPitch = __webpack_require__(223);
 
 	var _controllersPitch2 = _interopRequireDefault(_controllersPitch);
 
-	var _controllersEventsView = __webpack_require__(223);
+	var _controllersEventsView = __webpack_require__(224);
 
 	var _controllersEventsView2 = _interopRequireDefault(_controllersEventsView);
 
-	var _controllersEventEventView = __webpack_require__(225);
+	var _controllersEventEventView = __webpack_require__(226);
 
 	var _controllersEventEventView2 = _interopRequireDefault(_controllersEventEventView);
 
-	var _controllersEventEventCreate = __webpack_require__(226);
+	var _controllersEventEventCreate = __webpack_require__(227);
 
 	var _controllersEventEventCreate2 = _interopRequireDefault(_controllersEventEventCreate);
 
-	var _controllersEventEventList = __webpack_require__(227);
+	var _controllersEventEventList = __webpack_require__(228);
 
 	var _controllersEventEventList2 = _interopRequireDefault(_controllersEventEventList);
 
-	var _controllersLoginController = __webpack_require__(228);
+	var _controllersLoginController = __webpack_require__(230);
 
 	var _controllersLoginController2 = _interopRequireDefault(_controllersLoginController);
 
@@ -86,26 +86,28 @@
 
 	_modulesSession.actions.getLocation();
 
-	document.addEventListener("fb_init", _modulesSession.actions.getLoginStatus);
+	document.addEventListener("fb_init", function () {
+		_modulesSession.actions.fetchLogin();
 
-	_react2["default"].render(_react2["default"].createElement(
-		_reactRouter.Router,
-		null,
-		_react2["default"].createElement(
-			_reactRouter.Route,
-			{ path: "/", component: _App2["default"] },
-			_react2["default"].createElement(_reactRouter.IndexRoute, { component: _controllersPitch2["default"] }),
+		_react2["default"].render(_react2["default"].createElement(
+			_reactRouter.Router,
+			null,
 			_react2["default"].createElement(
 				_reactRouter.Route,
-				{ path: "events", component: _controllersEventsView2["default"] },
-				_react2["default"].createElement(_reactRouter.IndexRoute, { component: _controllersEventEventList2["default"] }),
-				_react2["default"].createElement(_reactRouter.Route, { path: "create", component: _controllersEventEventCreate2["default"] }),
-				_react2["default"].createElement(_reactRouter.Route, { path: ":id", component: _controllersEventEventView2["default"] })
+				{ path: "/", component: _App2["default"] },
+				_react2["default"].createElement(_reactRouter.IndexRoute, { component: _controllersPitch2["default"] }),
+				_react2["default"].createElement(
+					_reactRouter.Route,
+					{ path: "events", component: _controllersEventsView2["default"] },
+					_react2["default"].createElement(_reactRouter.IndexRoute, { component: _controllersEventEventList2["default"] }),
+					_react2["default"].createElement(_reactRouter.Route, { path: "create", component: _controllersEventEventCreate2["default"] }),
+					_react2["default"].createElement(_reactRouter.Route, { path: ":id", component: _controllersEventEventView2["default"] })
+				),
+				_react2["default"].createElement(_reactRouter.Route, { path: "login", component: _controllersLoginController2["default"] })
 			),
-			_react2["default"].createElement(_reactRouter.Route, { path: "login", component: _controllersLoginController2["default"] })
-		),
-		_react2["default"].createElement(_reactRouter.Route, { path: "*", component: _App2["default"] })
-	), document.getElementById("entry"));
+			_react2["default"].createElement(_reactRouter.Route, { path: "*", component: _App2["default"] })
+		), document.getElementById("entry"));
+	});
 	/* better 404 eventually */
 
 /***/ },
@@ -24338,7 +24340,7 @@
 
 	var _modulesSession = __webpack_require__(204);
 
-	var _modulesEvents = __webpack_require__(210);
+	var _modulesEvents = __webpack_require__(216);
 
 	var App = _react2["default"].createClass({
 		displayName: "App",
@@ -24356,7 +24358,7 @@
 			if (this.state.currentEvent.get("lat")) {
 				loadMap(_react2["default"].findDOMNode(this.refs.map), this.state.currentEvent.get("lat"), this.state.currentEvent.get("lng"), 15);
 			} else {
-				if (this.state.location) {
+				if (this.state.location && this.state.location.toJS) {
 					loadMap(_react2["default"].findDOMNode(this.refs.map), this.state.location.toJS().coords.latitude, this.state.location.toJS().coords.longitude, 17);
 				}
 			}
@@ -24396,7 +24398,7 @@
 			el.style.position = "absolute";
 
 			var map = new google.maps.Map(el, {
-				center: { lat: lat, lng: lng },
+				center: { lat: parseFloat(lat), lng: parseFloat(lng) },
 				scrollwheel: false,
 				zoom: zoom,
 				disableDefaultUI: true,
@@ -30919,7 +30921,7 @@
 
 	exports["default"] = {
 		actions: __webpack_require__(208),
-		getters: __webpack_require__(209)
+		getters: __webpack_require__(215)
 	};
 	module.exports = exports["default"];
 
@@ -31041,13 +31043,19 @@
 	});
 	exports.getLocation = getLocation;
 	exports.login = login;
-	exports.getLoginStatus = getLoginStatus;
+	exports.fetchLogin = fetchLogin;
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+
+	var _qwest = __webpack_require__(209);
+
+	var _qwest2 = _interopRequireDefault(_qwest);
 
 	var _reactor = __webpack_require__(202);
 
 	var _reactor2 = _interopRequireDefault(_reactor);
+
+	var _constants = __webpack_require__(214);
 
 	var _actionTypes = __webpack_require__(206);
 
@@ -31071,7 +31079,17 @@
 				if (!response.status) {
 					_reactor2["default"].dispatch(_actionTypes2["default"].LOGIN_USER_FAILURE, { response: response });
 				} else {
-					_reactor2["default"].dispatch(_actionTypes2["default"].LOGIN_USER_SUCCESS, { response: response });
+					FB.api("/me", { fields: ["picture", "name"] }, function (r) {
+						_qwest2["default"].post(_constants.apiURL + "/users", {
+							id: response.authResponse.userID,
+							photo: r.picture.data.url,
+							name: r.name
+						}).then(function (xhr, resp) {
+							_reactor2["default"].dispatch(_actionTypes2["default"].LOGIN_USER_SUCCESS, { response: response });
+						}, function (error) {
+							_reactor2["default"].dispatch(_actionTypes2["default"].LOGIN_USER_FAILURE, { error: error });
+						});
+					});
 				}
 			});
 		} else {
@@ -31079,7 +31097,7 @@
 		}
 	}
 
-	function getLoginStatus() {
+	function fetchLogin() {
 		_reactor2["default"].dispatch(_actionTypes2["default"].GET_LOGIN, {});
 
 		if (FB) {
@@ -31087,7 +31105,17 @@
 				if (!response.status) {
 					_reactor2["default"].dispatch(_actionTypes2["default"].GET_LOGIN_FAILURE, { response: response });
 				} else {
-					_reactor2["default"].dispatch(_actionTypes2["default"].GET_LOGIN_SUCCESS, { response: response });
+					FB.api("/me", { fields: ["picture", "name"] }, function (r) {
+						_qwest2["default"].post(_constants.apiURL + "/users", {
+							id: response.authResponse.userID,
+							picture: r.picture.data.url,
+							name: r.name
+						}).then(function (xhr, resp) {
+							_reactor2["default"].dispatch(_actionTypes2["default"].GET_LOGIN_SUCCESS, { response: response });
+						}, function (error) {
+							_reactor2["default"].dispatch(_actionTypes2["default"].GET_LOGIN_FAILURE, { error: error });
+						});
+					});
 				}
 			});
 		} else {
@@ -31097,200 +31125,13 @@
 
 /***/ },
 /* 209 */
-/***/ function(module, exports) {
+/***/ function(module, exports, __webpack_require__) {
 
-	"use strict";
-
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	var location = ["location", "geo"];
-
-	exports.location = location;
-	var user = ["user"];
-
-	exports.user = user;
-	var userId = ["user", "userID"];
-	exports.userId = userId;
+	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_RESULT__;/* WEBPACK VAR INJECTION */(function(module, setImmediate, process) {!function(e){"use strict";var t=function(e){var t=function(e,t,n){n="function"==typeof n?n():null===n?"":void 0===n?"":n,e[e.length]=encodeURIComponent(t)+"="+encodeURIComponent(n)},n=function(e,o,s){var r,i,a;if("[object Array]"===Object.prototype.toString.call(o))for(r=0,i=o.length;i>r;r++)n(e+"["+("object"==typeof o[r]?r:"")+"]",o[r],s);else if(o&&"[object Object]"===o.toString())for(a in o)o.hasOwnProperty(a)&&(e?n(e+"["+a+"]",o[a],s,t):n(a,o[a],s,t));else if(e)t(s,e,o);else for(a in o)t(s,a,o[a]);return s};return n("",e,[]).join("&").replace(/%20/g,"+")};"object"==typeof module&&"object"==typeof module.exports?module.exports=t: true?!(__WEBPACK_AMD_DEFINE_ARRAY__ = [], __WEBPACK_AMD_DEFINE_RESULT__ = function(){return t}.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__)):e.param=t}(this),function(e){function t(e){return"function"==typeof e}function n(e){return"object"==typeof e}function o(e){"undefined"!=typeof setImmediate?setImmediate(e):"undefined"!=typeof process&&process.nextTick?process.nextTick(e):setTimeout(e,0)}var s;e[0][e[1]]=function r(e){var i,a=[],p=[],d=function(e,t){return null==i&&null!=e&&(i=e,a=t,p.length&&o(function(){for(var e=0;e<p.length;e++)p[e]()})),i};return d.then=function(d,c){var u=r(e),h=function(){function e(o){var r,i=0;try{if(o&&(n(o)||t(o))&&t(r=o.then)){if(o===u)throw new TypeError;r.call(o,function(){i++||e.apply(s,arguments)},function(e){i++||u(!1,[e])})}else u(!0,arguments)}catch(a){i++||u(!1,[a])}}try{var o=i?d:c;t(o)?e(o.apply(s,a||[])):u(i,a)}catch(r){u(!1,[r])}};return null!=i?o(h):p.push(h),u},e&&(d=e(d)),d}}( false?[window,"pinkySwear"]:[module,"exports"]),function(e,t,n){"undefined"!=typeof module&&module.exports?module.exports=n: true?!(__WEBPACK_AMD_DEFINE_FACTORY__ = (n), __WEBPACK_AMD_DEFINE_RESULT__ = (typeof __WEBPACK_AMD_DEFINE_FACTORY__ === 'function' ? (__WEBPACK_AMD_DEFINE_FACTORY__.call(exports, __webpack_require__, exports, module)) : __WEBPACK_AMD_DEFINE_FACTORY__), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__)):e[t]=n}(this,"qwest",function(){var win=window,doc=document,defaultXdrResponseType="json",limit=null,requests=0,request_stack=[],getXHR=function(){return win.XMLHttpRequest?new win.XMLHttpRequest:new ActiveXObject("Microsoft.XMLHTTP")},xhr2=""===getXHR().responseType,qwest=function(method,url,data,options,before){method=method.toUpperCase(),data=data||null,options=options||{};var nativeResponseParsing=!1,crossOrigin,xhr,xdr=!1,timeoutInterval,aborted=!1,attempts=0,headers={},mimeTypes={text:"*/*",xml:"text/xml",json:"application/json",post:"application/x-www-form-urlencoded"},accept={text:"*/*",xml:"application/xml; q=1.0, text/xml; q=0.8, */*; q=0.1",json:"application/json; q=1.0, text/*; q=0.8, */*; q=0.1"},vars="",i,j,serialized,response,sending=!1,delayed=!1,timeout_start,promise=__webpack_require__(212)(function(e){return e["catch"]=function(t){return e.then(null,t)},e.complete=function(t){return e.then(t,t)},e.send=function(){if(!sending){if(sending=!0,limit&&++requests==limit)return void request_stack.push(e);if(timeout_start=Date.now(),xhr=getXHR(),crossOrigin&&("withCredentials"in xhr||!win.XDomainRequest||(xhr=new XDomainRequest,xdr=!0,"GET"!=method&&"POST"!=method&&(method="POST"))),xdr?xhr.open(method,url):(xhr.open(method,url,options.async,options.user,options.password),xhr2&&options.async&&(xhr.withCredentials=options.withCredentials)),!xdr)for(var t in headers)headers[t]&&xhr.setRequestHeader(t,headers[t]);if(xhr2&&"document"!=options.responseType&&"auto"!=options.responseType)try{xhr.responseType=options.responseType,nativeResponseParsing=xhr.responseType==options.responseType}catch(n){}xhr2||xdr?(xhr.onload=handleResponse,xhr.onerror=handleError):xhr.onreadystatechange=function(){4==xhr.readyState&&handleResponse()},"auto"!=options.responseType&&"overrideMimeType"in xhr&&xhr.overrideMimeType(mimeTypes[options.responseType]),before&&before(xhr),xdr?setTimeout(function(){xhr.send("GET"!=method?data:null)},0):xhr.send("GET"!=method?data:null)}},e}),handleResponse=function(){var i,responseType;if(--requests,sending=!1,Date.now()-timeout_start>=options.timeout)return void(options.attempts&&++attempts==options.attempts?promise(!1,[xhr,response,new Error("Timeout ("+url+")")]):promise.send());request_stack.length&&request_stack.shift().send();try{if(nativeResponseParsing&&"response"in xhr&&null!==xhr.response)response=xhr.response;else if("document"==options.responseType){var frame=doc.createElement("iframe");frame.style.display="none",doc.body.appendChild(frame),frame.contentDocument.open(),frame.contentDocument.write(xhr.response),frame.contentDocument.close(),response=frame.contentDocument,doc.body.removeChild(frame)}else{if(responseType=options.responseType,"auto"==responseType)if(xdr)responseType=defaultXdrResponseType;else{var ct=xhr.getResponseHeader("Content-Type")||"";responseType=ct.indexOf(mimeTypes.json)>-1?"json":ct.indexOf(mimeTypes.xml)>-1?"xml":"text"}switch(responseType){case"json":try{response="JSON"in win?JSON.parse(xhr.responseText):eval("("+xhr.responseText+")")}catch(e){throw"Error while parsing JSON body : "+e}break;case"xml":try{win.DOMParser?response=(new DOMParser).parseFromString(xhr.responseText,"text/xml"):(response=new ActiveXObject("Microsoft.XMLDOM"),response.async="false",response.loadXML(xhr.responseText))}catch(e){response=void 0}if(!response||!response.documentElement||response.getElementsByTagName("parsererror").length)throw"Invalid XML";break;default:response=xhr.responseText}}if("status"in xhr&&!/^2|1223/.test(xhr.status))throw xhr.status+" ("+xhr.statusText+")";promise(!0,[xhr,response])}catch(e){promise(!1,[xhr,response,e])}},handleError=function(e){--requests,promise(!1,[xhr,null,new Error("Connection aborted")])};switch(options.async="async"in options?!!options.async:!0,options.cache="cache"in options?!!options.cache:!1,options.dataType="dataType"in options?options.dataType.toLowerCase():"post",options.responseType="responseType"in options?options.responseType.toLowerCase():"auto",options.user=options.user||"",options.password=options.password||"",options.withCredentials=!!options.withCredentials,options.timeout="timeout"in options?parseInt(options.timeout,10):3e4,options.attempts="attempts"in options?parseInt(options.attempts,10):1,i=url.match(/\/\/(.+?)\//),crossOrigin=i&&(i[1]?i[1]!=location.host:!1),"ArrayBuffer"in win&&data instanceof ArrayBuffer?options.dataType="arraybuffer":"Blob"in win&&data instanceof Blob?options.dataType="blob":"Document"in win&&data instanceof Document?options.dataType="document":"FormData"in win&&data instanceof FormData&&(options.dataType="formdata"),options.dataType){case"json":data=JSON.stringify(data);break;case"post":data=__webpack_require__(213)(data)}if(options.headers){var format=function(e,t,n){return t+n.toUpperCase()};for(i in options.headers)headers[i.replace(/(^|-)([^-])/g,format)]=options.headers[i]}return"Content-Type"in headers||"GET"==method||options.dataType in mimeTypes&&mimeTypes[options.dataType]&&(headers["Content-Type"]=mimeTypes[options.dataType]),headers.Accept||(headers.Accept=options.responseType in accept?accept[options.responseType]:"*/*"),crossOrigin||"X-Requested-With"in headers||(headers["X-Requested-With"]="XMLHttpRequest"),options.cache||"Cache-Control"in headers||(headers["Cache-Control"]="no-cache"),"GET"==method&&data&&(vars+=data),vars&&(url+=(/\?/.test(url)?"&":"?")+vars),options.async&&promise.send(),promise};return{base:"",get:function(e,t,n,o){return qwest("GET",this.base+e,t,n,o)},post:function(e,t,n,o){return qwest("POST",this.base+e,t,n,o)},put:function(e,t,n,o){return qwest("PUT",this.base+e,t,n,o)},"delete":function(e,t,n,o){return qwest("DELETE",this.base+e,t,n,o)},map:function(e,t,n,o,s){return qwest(e.toUpperCase(),this.base+t,n,o,s)},xhr2:xhr2,limit:function(e){limit=e},setDefaultXdrResponseType:function(e){defaultXdrResponseType=e.toLowerCase()}}}());
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(210)(module), __webpack_require__(211).setImmediate, __webpack_require__(3)))
 
 /***/ },
 /* 210 */
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-
-	Object.defineProperty(exports, "__esModule", {
-		value: true
-	});
-
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
-
-	var _reactor = __webpack_require__(202);
-
-	var _reactor2 = _interopRequireDefault(_reactor);
-
-	_reactor2["default"].registerStores({
-		events: __webpack_require__(211),
-		current: __webpack_require__(213)
-	});
-
-	exports["default"] = {
-		actions: __webpack_require__(214),
-		getters: __webpack_require__(221)
-	};
-	module.exports = exports["default"];
-
-/***/ },
-/* 211 */
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-
-	Object.defineProperty(exports, "__esModule", {
-		value: true
-	});
-
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
-
-	var _nuclearJs = __webpack_require__(203);
-
-	var _actionTypes = __webpack_require__(212);
-
-	var _actionTypes2 = _interopRequireDefault(_actionTypes);
-
-	exports["default"] = new _nuclearJs.Store({
-		getInitialState: function getInitialState() {
-			return (0, _nuclearJs.toImmutable)([]);
-		},
-
-		initialize: function initialize() {
-			this.on(_actionTypes2["default"].GET_EVENTS_SUCCESS, updateEvents);
-		}
-	});
-
-	function updateEvents(state, _ref) {
-		var events = _ref.events;
-
-		return (0, _nuclearJs.toImmutable)(events);
-	}
-	module.exports = exports["default"];
-
-/***/ },
-/* 212 */
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-
-	Object.defineProperty(exports, "__esModule", {
-	   value: true
-	});
-
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
-
-	var _reactLibKeyMirror = __webpack_require__(6);
-
-	var _reactLibKeyMirror2 = _interopRequireDefault(_reactLibKeyMirror);
-
-	exports["default"] = (0, _reactLibKeyMirror2["default"])({
-	   GET_EVENTS: null,
-	   GET_EVENTS_SUCCESS: null,
-	   GET_EVENTS_FAILURE: null,
-
-	   SWIPE_EVENT: null
-	});
-	module.exports = exports["default"];
-
-/***/ },
-/* 213 */
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-
-	Object.defineProperty(exports, "__esModule", {
-		value: true
-	});
-
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
-
-	var _nuclearJs = __webpack_require__(203);
-
-	var _actionTypes = __webpack_require__(212);
-
-	var _actionTypes2 = _interopRequireDefault(_actionTypes);
-
-	exports["default"] = new _nuclearJs.Store({
-		getInitialState: function getInitialState() {
-			return null;
-		},
-
-		initialize: function initialize() {
-			this.on(_actionTypes2["default"].GET_EVENTS_SUCCESS, resetCurrent);
-			this.on(_actionTypes2["default"].SWIPE_EVENT, incrementCurrent);
-		}
-	});
-
-	function resetCurrent() {
-		return 0;
-	}
-
-	function incrementCurrent(old) {
-		return old + 1;
-	}
-	module.exports = exports["default"];
-
-/***/ },
-/* 214 */
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-
-	Object.defineProperty(exports, "__esModule", {
-		value: true
-	});
-	exports.getEvents = getEvents;
-	exports.swipeEvent = swipeEvent;
-
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
-
-	var _qwest = __webpack_require__(215);
-
-	var _qwest2 = _interopRequireDefault(_qwest);
-
-	var _constants = __webpack_require__(220);
-
-	var _reactor = __webpack_require__(202);
-
-	var _reactor2 = _interopRequireDefault(_reactor);
-
-	var _actionTypes = __webpack_require__(212);
-
-	var _actionTypes2 = _interopRequireDefault(_actionTypes);
-
-	function getEvents() {
-		_reactor2["default"].dispatch(_actionTypes2["default"].GET_EVENTS, {});
-
-		_qwest2["default"].get(_constants.apiURL + "/events").then(function (xhr, result) {
-			var events = JSON.parse(result);
-
-			_reactor2["default"].dispatch(_actionTypes2["default"].GET_EVENTS_SUCCESS, { events: events });
-		}, function (error) {
-			_reactor2["default"].dispatch(_actionTypes2["default"].GET_EVENTS_FAILURE, { error: error });
-		});
-	}
-
-	function swipeEvent(decision) {
-		_reactor2["default"].dispatch(_actionTypes2["default"].SWIPE_EVENT, {});
-	}
-
-/***/ },
-/* 215 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_RESULT__;/* WEBPACK VAR INJECTION */(function(module, setImmediate, process) {!function(e){"use strict";var t=function(e){var t=function(e,t,n){n="function"==typeof n?n():null===n?"":void 0===n?"":n,e[e.length]=encodeURIComponent(t)+"="+encodeURIComponent(n)},n=function(e,o,s){var r,i,a;if("[object Array]"===Object.prototype.toString.call(o))for(r=0,i=o.length;i>r;r++)n(e+"["+("object"==typeof o[r]?r:"")+"]",o[r],s);else if(o&&"[object Object]"===o.toString())for(a in o)o.hasOwnProperty(a)&&(e?n(e+"["+a+"]",o[a],s,t):n(a,o[a],s,t));else if(e)t(s,e,o);else for(a in o)t(s,a,o[a]);return s};return n("",e,[]).join("&").replace(/%20/g,"+")};"object"==typeof module&&"object"==typeof module.exports?module.exports=t: true?!(__WEBPACK_AMD_DEFINE_ARRAY__ = [], __WEBPACK_AMD_DEFINE_RESULT__ = function(){return t}.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__)):e.param=t}(this),function(e){function t(e){return"function"==typeof e}function n(e){return"object"==typeof e}function o(e){"undefined"!=typeof setImmediate?setImmediate(e):"undefined"!=typeof process&&process.nextTick?process.nextTick(e):setTimeout(e,0)}var s;e[0][e[1]]=function r(e){var i,a=[],p=[],d=function(e,t){return null==i&&null!=e&&(i=e,a=t,p.length&&o(function(){for(var e=0;e<p.length;e++)p[e]()})),i};return d.then=function(d,c){var u=r(e),h=function(){function e(o){var r,i=0;try{if(o&&(n(o)||t(o))&&t(r=o.then)){if(o===u)throw new TypeError;r.call(o,function(){i++||e.apply(s,arguments)},function(e){i++||u(!1,[e])})}else u(!0,arguments)}catch(a){i++||u(!1,[a])}}try{var o=i?d:c;t(o)?e(o.apply(s,a||[])):u(i,a)}catch(r){u(!1,[r])}};return null!=i?o(h):p.push(h),u},e&&(d=e(d)),d}}( false?[window,"pinkySwear"]:[module,"exports"]),function(e,t,n){"undefined"!=typeof module&&module.exports?module.exports=n: true?!(__WEBPACK_AMD_DEFINE_FACTORY__ = (n), __WEBPACK_AMD_DEFINE_RESULT__ = (typeof __WEBPACK_AMD_DEFINE_FACTORY__ === 'function' ? (__WEBPACK_AMD_DEFINE_FACTORY__.call(exports, __webpack_require__, exports, module)) : __WEBPACK_AMD_DEFINE_FACTORY__), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__)):e[t]=n}(this,"qwest",function(){var win=window,doc=document,defaultXdrResponseType="json",limit=null,requests=0,request_stack=[],getXHR=function(){return win.XMLHttpRequest?new win.XMLHttpRequest:new ActiveXObject("Microsoft.XMLHTTP")},xhr2=""===getXHR().responseType,qwest=function(method,url,data,options,before){method=method.toUpperCase(),data=data||null,options=options||{};var nativeResponseParsing=!1,crossOrigin,xhr,xdr=!1,timeoutInterval,aborted=!1,attempts=0,headers={},mimeTypes={text:"*/*",xml:"text/xml",json:"application/json",post:"application/x-www-form-urlencoded"},accept={text:"*/*",xml:"application/xml; q=1.0, text/xml; q=0.8, */*; q=0.1",json:"application/json; q=1.0, text/*; q=0.8, */*; q=0.1"},vars="",i,j,serialized,response,sending=!1,delayed=!1,timeout_start,promise=__webpack_require__(218)(function(e){return e["catch"]=function(t){return e.then(null,t)},e.complete=function(t){return e.then(t,t)},e.send=function(){if(!sending){if(sending=!0,limit&&++requests==limit)return void request_stack.push(e);if(timeout_start=Date.now(),xhr=getXHR(),crossOrigin&&("withCredentials"in xhr||!win.XDomainRequest||(xhr=new XDomainRequest,xdr=!0,"GET"!=method&&"POST"!=method&&(method="POST"))),xdr?xhr.open(method,url):(xhr.open(method,url,options.async,options.user,options.password),xhr2&&options.async&&(xhr.withCredentials=options.withCredentials)),!xdr)for(var t in headers)headers[t]&&xhr.setRequestHeader(t,headers[t]);if(xhr2&&"document"!=options.responseType&&"auto"!=options.responseType)try{xhr.responseType=options.responseType,nativeResponseParsing=xhr.responseType==options.responseType}catch(n){}xhr2||xdr?(xhr.onload=handleResponse,xhr.onerror=handleError):xhr.onreadystatechange=function(){4==xhr.readyState&&handleResponse()},"auto"!=options.responseType&&"overrideMimeType"in xhr&&xhr.overrideMimeType(mimeTypes[options.responseType]),before&&before(xhr),xdr?setTimeout(function(){xhr.send("GET"!=method?data:null)},0):xhr.send("GET"!=method?data:null)}},e}),handleResponse=function(){var i,responseType;if(--requests,sending=!1,Date.now()-timeout_start>=options.timeout)return void(options.attempts&&++attempts==options.attempts?promise(!1,[xhr,response,new Error("Timeout ("+url+")")]):promise.send());request_stack.length&&request_stack.shift().send();try{if(nativeResponseParsing&&"response"in xhr&&null!==xhr.response)response=xhr.response;else if("document"==options.responseType){var frame=doc.createElement("iframe");frame.style.display="none",doc.body.appendChild(frame),frame.contentDocument.open(),frame.contentDocument.write(xhr.response),frame.contentDocument.close(),response=frame.contentDocument,doc.body.removeChild(frame)}else{if(responseType=options.responseType,"auto"==responseType)if(xdr)responseType=defaultXdrResponseType;else{var ct=xhr.getResponseHeader("Content-Type")||"";responseType=ct.indexOf(mimeTypes.json)>-1?"json":ct.indexOf(mimeTypes.xml)>-1?"xml":"text"}switch(responseType){case"json":try{response="JSON"in win?JSON.parse(xhr.responseText):eval("("+xhr.responseText+")")}catch(e){throw"Error while parsing JSON body : "+e}break;case"xml":try{win.DOMParser?response=(new DOMParser).parseFromString(xhr.responseText,"text/xml"):(response=new ActiveXObject("Microsoft.XMLDOM"),response.async="false",response.loadXML(xhr.responseText))}catch(e){response=void 0}if(!response||!response.documentElement||response.getElementsByTagName("parsererror").length)throw"Invalid XML";break;default:response=xhr.responseText}}if("status"in xhr&&!/^2|1223/.test(xhr.status))throw xhr.status+" ("+xhr.statusText+")";promise(!0,[xhr,response])}catch(e){promise(!1,[xhr,response,e])}},handleError=function(e){--requests,promise(!1,[xhr,null,new Error("Connection aborted")])};switch(options.async="async"in options?!!options.async:!0,options.cache="cache"in options?!!options.cache:!1,options.dataType="dataType"in options?options.dataType.toLowerCase():"post",options.responseType="responseType"in options?options.responseType.toLowerCase():"auto",options.user=options.user||"",options.password=options.password||"",options.withCredentials=!!options.withCredentials,options.timeout="timeout"in options?parseInt(options.timeout,10):3e4,options.attempts="attempts"in options?parseInt(options.attempts,10):1,i=url.match(/\/\/(.+?)\//),crossOrigin=i&&(i[1]?i[1]!=location.host:!1),"ArrayBuffer"in win&&data instanceof ArrayBuffer?options.dataType="arraybuffer":"Blob"in win&&data instanceof Blob?options.dataType="blob":"Document"in win&&data instanceof Document?options.dataType="document":"FormData"in win&&data instanceof FormData&&(options.dataType="formdata"),options.dataType){case"json":data=JSON.stringify(data);break;case"post":data=__webpack_require__(219)(data)}if(options.headers){var format=function(e,t,n){return t+n.toUpperCase()};for(i in options.headers)headers[i.replace(/(^|-)([^-])/g,format)]=options.headers[i]}return"Content-Type"in headers||"GET"==method||options.dataType in mimeTypes&&mimeTypes[options.dataType]&&(headers["Content-Type"]=mimeTypes[options.dataType]),headers.Accept||(headers.Accept=options.responseType in accept?accept[options.responseType]:"*/*"),crossOrigin||"X-Requested-With"in headers||(headers["X-Requested-With"]="XMLHttpRequest"),options.cache||"Cache-Control"in headers||(headers["Cache-Control"]="no-cache"),"GET"==method&&data&&(vars+=data),vars&&(url+=(/\?/.test(url)?"&":"?")+vars),options.async&&promise.send(),promise};return{base:"",get:function(e,t,n,o){return qwest("GET",this.base+e,t,n,o)},post:function(e,t,n,o){return qwest("POST",this.base+e,t,n,o)},put:function(e,t,n,o){return qwest("PUT",this.base+e,t,n,o)},"delete":function(e,t,n,o){return qwest("DELETE",this.base+e,t,n,o)},map:function(e,t,n,o,s){return qwest(e.toUpperCase(),this.base+t,n,o,s)},xhr2:xhr2,limit:function(e){limit=e},setDefaultXdrResponseType:function(e){defaultXdrResponseType=e.toLowerCase()}}}());
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(216)(module), __webpack_require__(217).setImmediate, __webpack_require__(3)))
-
-/***/ },
-/* 216 */
 /***/ function(module, exports) {
 
 	module.exports = function(module) {
@@ -31306,7 +31147,7 @@
 
 
 /***/ },
-/* 217 */
+/* 211 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(setImmediate, clearImmediate) {var nextTick = __webpack_require__(3).nextTick;
@@ -31385,10 +31226,10 @@
 	exports.clearImmediate = typeof clearImmediate === "function" ? clearImmediate : function(id) {
 	  delete immediateIds[id];
 	};
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(217).setImmediate, __webpack_require__(217).clearImmediate))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(211).setImmediate, __webpack_require__(211).clearImmediate))
 
 /***/ },
-/* 218 */
+/* 212 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(module, setImmediate, process) {/*
@@ -31509,10 +31350,10 @@
 	})( false ? [window, 'pinkySwear'] : [module, 'exports']);
 
 
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(216)(module), __webpack_require__(217).setImmediate, __webpack_require__(3)))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(210)(module), __webpack_require__(211).setImmediate, __webpack_require__(3)))
 
 /***/ },
-/* 219 */
+/* 213 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/**
@@ -31569,7 +31410,7 @@
 
 
 /***/ },
-/* 220 */
+/* 214 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -31581,7 +31422,301 @@
 	exports.apiURL = apiURL;
 
 /***/ },
+/* 215 */
+/***/ function(module, exports) {
+
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	var location = ["location", "geo"];
+
+	exports.location = location;
+	var user = ["user"];
+
+	exports.user = user;
+	var userId = ["user", "userID"];
+	exports.userId = userId;
+
+/***/ },
+/* 216 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+
+	var _reactor = __webpack_require__(202);
+
+	var _reactor2 = _interopRequireDefault(_reactor);
+
+	_reactor2["default"].registerStores({
+		events: __webpack_require__(217),
+		interested: __webpack_require__(219),
+		current: __webpack_require__(220)
+	});
+
+	exports["default"] = {
+		actions: __webpack_require__(221),
+		getters: __webpack_require__(222)
+	};
+	module.exports = exports["default"];
+
+/***/ },
+/* 217 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+
+	var _nuclearJs = __webpack_require__(203);
+
+	var _actionTypes = __webpack_require__(218);
+
+	var _actionTypes2 = _interopRequireDefault(_actionTypes);
+
+	exports["default"] = new _nuclearJs.Store({
+		getInitialState: function getInitialState() {
+			return (0, _nuclearJs.toImmutable)({});
+		},
+
+		initialize: function initialize() {
+			this.on(_actionTypes2["default"].GET_EVENTS_SUCCESS, updateEvents);
+			this.on(_actionTypes2["default"].DECLINE_EVENT, declineEvent);
+		}
+	});
+
+	function updateEvents(state, _ref) {
+		var events = _ref.events;
+
+		var newState = {};
+		for (var i = events.length - 1; i >= 0; i--) {
+			var evt = events[i];
+			newState[evt.id] = evt;
+		}
+
+		return (0, _nuclearJs.toImmutable)(newState);
+	}
+
+	function declineEvent(state, _ref2) {
+		var id = _ref2.id;
+
+		return state["delete"](id.toString());
+	}
+	module.exports = exports["default"];
+
+/***/ },
+/* 218 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+	   value: true
+	});
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+
+	var _reactLibKeyMirror = __webpack_require__(6);
+
+	var _reactLibKeyMirror2 = _interopRequireDefault(_reactLibKeyMirror);
+
+	exports["default"] = (0, _reactLibKeyMirror2["default"])({
+	   GET_EVENTS: null,
+	   GET_EVENTS_SUCCESS: null,
+	   GET_EVENTS_FAILURE: null,
+
+	   DECLINE_EVENT: null,
+	   DECLINE_EVENT_SUCCESS: null,
+	   DECLINE_EVENT_FAILURE: null,
+
+	   INTEREST_EVENT: null,
+	   INTEREST_EVENT_SUCCESS: null,
+	   INTEREST_EVENT_FAILURE: null
+	});
+	module.exports = exports["default"];
+
+/***/ },
+/* 219 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+
+	var _nuclearJs = __webpack_require__(203);
+
+	var _actionTypes = __webpack_require__(218);
+
+	var _actionTypes2 = _interopRequireDefault(_actionTypes);
+
+	exports["default"] = new _nuclearJs.Store({
+		getInitialState: function getInitialState() {
+			return (0, _nuclearJs.toImmutable)({});
+		},
+
+		initialize: function initialize() {
+			this.on(_actionTypes2["default"].GET_EVENTS_SUCCESS, updateEvents);
+			this.on(_actionTypes2["default"].DECLINE_EVENT, declineEvent);
+		}
+	});
+
+	function updateEvents(state, _ref) {
+		var events = _ref.events;
+		var user = _ref.user;
+
+		var newState = {};
+		for (var i = events.length - 1; i >= 0; i--) {
+			var evt = events[i];
+
+			if (evt.interested_users.indexOf(user) !== -1) {
+				newState[evt.id] = evt;
+			}
+		}
+
+		return (0, _nuclearJs.toImmutable)(newState);
+	}
+
+	function declineEvent(state, _ref2) {
+		var id = _ref2.id;
+
+		return state["delete"](id.toString());
+	}
+	module.exports = exports["default"];
+
+/***/ },
+/* 220 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+
+	var _nuclearJs = __webpack_require__(203);
+
+	var _actionTypes = __webpack_require__(218);
+
+	var _actionTypes2 = _interopRequireDefault(_actionTypes);
+
+	exports["default"] = new _nuclearJs.Store({
+		getInitialState: function getInitialState() {
+			return null;
+		},
+
+		initialize: function initialize() {
+			this.on(_actionTypes2["default"].GET_EVENTS_SUCCESS, resetCurrent);
+			this.on(_actionTypes2["default"].SWIPE_EVENT, incrementCurrent);
+		}
+	});
+
+	function resetCurrent() {
+		return 0;
+	}
+
+	function incrementCurrent(old) {
+		return old + 1;
+	}
+	module.exports = exports["default"];
+
+/***/ },
 /* 221 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+	exports.getEvents = getEvents;
+	exports.declineEvent = declineEvent;
+	exports.interestEvent = interestEvent;
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+
+	var _qwest = __webpack_require__(209);
+
+	var _qwest2 = _interopRequireDefault(_qwest);
+
+	var _constants = __webpack_require__(214);
+
+	var _reactor = __webpack_require__(202);
+
+	var _reactor2 = _interopRequireDefault(_reactor);
+
+	var _actionTypes = __webpack_require__(218);
+
+	var _actionTypes2 = _interopRequireDefault(_actionTypes);
+
+	function getEvents(user) {
+		_reactor2["default"].dispatch(_actionTypes2["default"].GET_EVENTS, {});
+
+		var narrow = user ? "/" + user : "";
+
+		_qwest2["default"].get(_constants.apiURL + "/events" + narrow).then(function (xhr, result) {
+			var events = JSON.parse(result);
+
+			_reactor2["default"].dispatch(_actionTypes2["default"].GET_EVENTS_SUCCESS, { events: events, user: user });
+		}, function (error) {
+			_reactor2["default"].dispatch(_actionTypes2["default"].GET_EVENTS_FAILURE, { error: error });
+		});
+	}
+
+	function declineEvent(eventId, userId) {
+		if (!eventId) {
+			throw new TypeError("no event");
+		}
+
+		if (!userId) {
+			throw new TypeError("no user");
+		}
+
+		_reactor2["default"].dispatch(_actionTypes2["default"].DECLINE_EVENT, { id: eventId });
+
+		_qwest2["default"].post(_constants.apiURL + "/events/" + eventId + "/rejected/" + userId).then(function (xhr, result) {
+			_reactor2["default"].dispatch(_actionTypes2["default"].DECLINE_EVENT_SUCCESS, { id: eventId });
+		}, function (error) {
+			_reactor2["default"].dispatch(_actionTypes2["default"].DECLINE_EVENT_FAILURE, { id: eventId, error: error });
+		});
+	}
+
+	function interestEvent(eventId, userId) {
+		if (!eventId) {
+			throw new TypeError("no event");
+		}
+
+		if (!userId) {
+			throw new TypeError("no user");
+		}
+
+		_reactor2["default"].dispatch(_actionTypes2["default"].INTEREST_EVENT, { id: eventId });
+
+		_qwest2["default"].post(_constants.apiURL + "/events/" + eventId + "/interested/" + userId).then(function (xhr, result) {
+			_reactor2["default"].dispatch(_actionTypes2["default"].INTEREST_EVENT_SUCCESS, { id: eventId });
+		}, function (error) {
+			_reactor2["default"].dispatch(_actionTypes2["default"].INTEREST_EVENT_FAILURE, { id: eventId, error: error });
+		});
+	}
+
+/***/ },
+/* 222 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -31592,16 +31727,26 @@
 
 	var _nuclearJs = __webpack_require__(203);
 
-	var events = ["events"];
+	var eventsMap = ["events"];
+
+	exports.eventsMap = eventsMap;
+	var events = [eventsMap, function (map) {
+		return map.toList();
+	}];
 
 	exports.events = events;
-	var currentEvent = [["events"], ["current"], function (events, current) {
-		return events.get(current) || (0, _nuclearJs.toImmutable)({});
+	var interested = [["interested"], function (map) {
+		return map.toList();
+	}];
+
+	exports.interested = interested;
+	var currentEvent = [events, ["current"], function (es, current) {
+		return es.get(current) || (0, _nuclearJs.toImmutable)({});
 	}];
 	exports.currentEvent = currentEvent;
 
 /***/ },
-/* 222 */
+/* 223 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -31662,7 +31807,7 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 223 */
+/* 224 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -31687,7 +31832,7 @@
 
 	// import { Link } from "react-router";
 
-	var _componentsEvent = __webpack_require__(224);
+	var _componentsEvent = __webpack_require__(225);
 
 	var _componentsEvent2 = _interopRequireDefault(_componentsEvent);
 
@@ -31718,7 +31863,7 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 224 */
+/* 225 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -31741,7 +31886,7 @@
 
 	var _react2 = _interopRequireDefault(_react);
 
-	var _qwest = __webpack_require__(215);
+	var _qwest = __webpack_require__(209);
 
 	var _qwest2 = _interopRequireDefault(_qwest);
 
@@ -31773,8 +31918,14 @@
 			key: "render",
 			value: function render() {
 				var users = [];
-				for (var i = 0; i < this.props.minAttendance; i++) {
-					users.push(_react2["default"].createElement("img", { src: "http://placehold.it/60", alt: "a placeholder image" }));
+				var total = this.props.minAttendance;
+				var filled = this.props.interested;
+				var remaining = total - filled;
+				for (var i = 0; i < filled; i++) {
+					users.push(_react2["default"].createElement("img", { src: "interest.png", alt: "a placeholder image" }));
+				}
+				for (var i = 0; i < remaining; i++) {
+					users.push(_react2["default"].createElement("img", { src: "smile.png", alt: "a placeholder image" }));
 				}
 
 				return _react2["default"].createElement(
@@ -31790,7 +31941,8 @@
 						null,
 						this.props.address
 					),
-					_react2["default"].createElement("img", { src: this.props.picture, alt: "a placeholder image" }),
+					this.props.picture ? _react2["default"].createElement("img", { src: this.props.picture, alt: "a placeholder image" }) : null,
+					_react2["default"].createElement("br", null),
 					users,
 					_react2["default"].createElement(
 						"p",
@@ -31820,7 +31972,7 @@
 	/*<div ref="map" style={{height: 250, width: "100%"}}></div>*/
 
 /***/ },
-/* 225 */
+/* 226 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -31843,6 +31995,8 @@
 
 	var _modulesSession = __webpack_require__(204);
 
+	var _modulesEvents = __webpack_require__(216);
+
 	var EventView = _react2["default"].createClass({
 		displayName: "EventView",
 
@@ -31850,7 +32004,8 @@
 
 		getDataBindings: function getDataBindings() {
 			return {
-				userId: _modulesSession.getters.userId
+				userId: _modulesSession.getters.userId,
+				eventsMap: _modulesEvents.getters.eventsMap
 			};
 		},
 
@@ -31861,11 +32016,54 @@
 		},
 
 		render: function render() {
+			var _this = this;
+
+			var current = this.state.eventsMap.get(this.props.params.id.toString());
+
+			if (!current) {
+				return _react2["default"].createElement("div", null);
+			}
+
 			return _react2["default"].createElement(
 				"div",
-				null,
-				"A single event!",
-				this.props.children
+				{ className: "card" },
+				_react2["default"].createElement(
+					"h1",
+					null,
+					"Confirm your interest in ",
+					current.get("name")
+				),
+				_react2["default"].createElement(
+					"h2",
+					null,
+					current.get("address")
+				),
+				_react2["default"].createElement(
+					"p",
+					null,
+					"here are pictures of people"
+				),
+				_react2["default"].createElement(
+					"p",
+					null,
+					"logistics here"
+				),
+				_react2["default"].createElement(
+					"button",
+					{ className: "button button--text",
+						onClick: function () {
+							_this.history.go(-1);
+						} },
+					"Back"
+				),
+				_react2["default"].createElement(
+					"button",
+					{ className: "button button--good",
+						onClick: function () {
+							_modulesEvents.actions.interestEvent(_this.props.params.id, _this.state.userId);
+						} },
+					"I'm interested!"
+				)
 			);
 		}
 	});
@@ -31874,7 +32072,7 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 226 */
+/* 227 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -31925,7 +32123,53 @@
 						"Event location",
 						_react2["default"].createElement("input", { type: "text", id: "create_location" })
 					),
-					"(map here)",
+					_react2["default"].createElement("br", null),
+					_react2["default"].createElement(
+						"label",
+						{ htmlFor: "create_description" },
+						"Event description",
+						_react2["default"].createElement("input", { type: "text", id: "create_description" })
+					),
+					_react2["default"].createElement("br", null),
+					_react2["default"].createElement(
+						"table",
+						null,
+						_react2["default"].createElement(
+							"tr",
+							null,
+							_react2["default"].createElement(
+								"td",
+								{ className: "third-width" },
+								_react2["default"].createElement(
+									"label",
+									{ htmlFor: "create_time" },
+									"Event time",
+									_react2["default"].createElement("input", { type: "time", id: "create_time" })
+								)
+							),
+							_react2["default"].createElement(
+								"td",
+								{ className: "third-width" },
+								_react2["default"].createElement(
+									"label",
+									{ htmlFor: "create_duration" },
+									"Event duration (hours)",
+									_react2["default"].createElement("input", { type: "text", id: "create_duration", placeholder: "1" })
+								)
+							),
+							_react2["default"].createElement(
+								"td",
+								{ className: "third-width" },
+								_react2["default"].createElement(
+									"label",
+									{ htmlFor: "min_duration" },
+									"Minimum attendance",
+									_react2["default"].createElement("input", { type: "text", id: "min_duration", placeholder: "3" })
+								)
+							)
+						)
+					),
+					_react2["default"].createElement("br", null),
 					_react2["default"].createElement("input", { type: "submit", value: "Create!" }),
 					this.props.children
 				);
@@ -31939,7 +32183,7 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 227 */
+/* 228 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -31960,11 +32204,17 @@
 
 	var _reactor2 = _interopRequireDefault(_reactor);
 
-	var _componentsEvent = __webpack_require__(224);
+	var _componentsEvent = __webpack_require__(225);
 
 	var _componentsEvent2 = _interopRequireDefault(_componentsEvent);
 
-	var _modulesEvents = __webpack_require__(210);
+	var _componentsInterested = __webpack_require__(229);
+
+	var _componentsInterested2 = _interopRequireDefault(_componentsInterested);
+
+	var _modulesEvents = __webpack_require__(216);
+
+	var _modulesSession = __webpack_require__(204);
 
 	var EventList = _react2["default"].createClass({
 		displayName: "EventList",
@@ -31973,16 +32223,18 @@
 
 		getDataBindings: function getDataBindings() {
 			return {
-				event: _modulesEvents.getters.currentEvent
+				event: _modulesEvents.getters.currentEvent,
+				interested: _modulesEvents.getters.interested,
+				userId: _modulesSession.getters.userId
 			};
 		},
 
 		componentWillMount: function componentWillMount() {
-			_modulesEvents.actions.getEvents();
+			_modulesEvents.actions.getEvents(this.state.userId);
 		},
 
 		handleDecline: function handleDecline() {
-			_modulesEvents.actions.swipeEvent();
+			_modulesEvents.actions.declineEvent(this.state.event.get("id"), this.state.userId);
 		},
 
 		handleInterested: function handleInterested() {
@@ -31990,15 +32242,30 @@
 		},
 
 		render: function render() {
-			return _react2["default"].createElement(_componentsEvent2["default"], { title: this.state.event.get("name"),
-				picture: this.state.event.get("picture"),
-				address: this.state.event.get("address"),
-				latitude: this.state.event.get("lat"),
-				longitude: this.state.event.get("lng"),
-				description: this.state.event.get("description"),
-				minAttendance: this.state.event.get("min_attendance"),
-				onDecline: this.handleDecline,
-				onInterested: this.handleInterested });
+
+			var interests = [];
+			for (var i = this.state.interested.toJS().length - 1; i >= 0; i--) {
+				var current = this.state.interested.get(i);
+				interests.push(_react2["default"].createElement(_componentsInterested2["default"], {
+					title: current.get("name"),
+					minAttendance: current.get("min_attendance") }));
+			}
+
+			return _react2["default"].createElement(
+				"div",
+				null,
+				interests,
+				_react2["default"].createElement(_componentsEvent2["default"], { title: this.state.event.get("name"),
+					picture: this.state.event.get("picture"),
+					address: this.state.event.get("address"),
+					latitude: this.state.event.get("lat"),
+					longitude: this.state.event.get("lng"),
+					description: this.state.event.get("description"),
+					minAttendance: this.state.event.get("min_attendance"),
+					interested: (this.state.event.get("interested_users") || {}).size,
+					onDecline: this.handleDecline,
+					onInterested: this.handleInterested })
+			);
 		}
 	});
 
@@ -32006,7 +32273,67 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 228 */
+/* 229 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+
+	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
+	var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; desc = parent = getter = undefined; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; continue _function; } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+	var _react = __webpack_require__(1);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	var Interested = (function (_React$Component) {
+		_inherits(Interested, _React$Component);
+
+		function Interested() {
+			_classCallCheck(this, Interested);
+
+			_get(Object.getPrototypeOf(Interested.prototype), "constructor", this).apply(this, arguments);
+		}
+
+		_createClass(Interested, [{
+			key: "render",
+			value: function render() {
+				var users = [];
+				for (var i = 0; i < this.props.minAttendance; i++) {
+					users.push(_react2["default"].createElement("img", { src: "smile.png", alt: "a placeholder image" }));
+				}
+
+				return _react2["default"].createElement(
+					"div",
+					{ className: "card" },
+					_react2["default"].createElement(
+						"h1",
+						null,
+						this.props.title
+					),
+					users
+				);
+			}
+		}]);
+
+		return Interested;
+	})(_react2["default"].Component);
+
+	exports["default"] = Interested;
+	module.exports = exports["default"];
+
+/***/ },
+/* 230 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -32041,7 +32368,15 @@
 		},
 
 		handleLogin: function handleLogin() {
-			_modulesSession.actions.login();
+			var _this = this;
+
+			FB.getLoginStatus(function (response) {
+				if (response.status === "connected") {
+					_this.history.go(-1);
+				} else {
+					_modulesSession.actions.login();
+				}
+			});
 		},
 
 		handleCancel: function handleCancel() {
