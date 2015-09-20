@@ -13,6 +13,8 @@ import { actions } from "modules/session";
 
 actions.getLocation();
 
+document.addEventListener("fb_init", function() { console.log("hi"); actions.getLoginStatus(); });
+
 React.render(
 	(<Router>
 		<Route path="/" component={App}>
@@ -28,5 +30,5 @@ React.render(
 
 		<Route path="*" component={App} />{/* better 404 eventually */}
 	</Router>),
-	document.body
+	document.getElementById("entry")
 );

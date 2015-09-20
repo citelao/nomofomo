@@ -34,11 +34,11 @@
 			text-align: center;
 		}
 
-			.card--bottom {
-				position: fixed;
-				bottom: 0;
-				/*width: 100%;*/
-			}
+		.card--bottom {
+			position: fixed;
+			bottom: 0;
+			/*width: 100%;*/
+		}
 
 		.map {
 			position: absolute;
@@ -52,8 +52,31 @@
 	</style>
 </head>
 <body>
-	<h1>Loading...</h1>
+	<div id="entry">Loading...</div>
 
+	<script>
+		window.fbAsyncInit = function() {
+			FB.init({
+				appId      : '164408443898695',
+				xfbml      : false,
+				version    : 'v2.4'
+			});
+			
+			FB.getLoginStatus(function() {
+				var fbe = new Event("fb_init");
+				document.dispatchEvent(fbe);
+			});
+		};
+
+
+		(function(d, s, id){
+			var js, fjs = d.getElementsByTagName(s)[0];
+			if (d.getElementById(id)) {return;}
+			js = d.createElement(s); js.id = id;
+			js.src = "//connect.facebook.net/en_US/sdk.js";
+			fjs.parentNode.insertBefore(js, fjs);
+		}(document, 'script', 'facebook-jssdk'));
+	</script>
 	<script src="bundle.js"></script>
 </body>
 </html>

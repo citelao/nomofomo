@@ -14,7 +14,7 @@ const LoginController = React.createClass({
 	},
 
 	handleLogin() {
-		debugger;
+		actions.login();
 	},
 
 	handleCancel() {

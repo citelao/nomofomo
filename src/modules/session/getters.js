@@ -2,4 +2,4 @@ export const location = ["location", "geo"];
 
 export const user = ["user"];
 
-export const userId = ["user", "id"];
+export const userId = ["user", "userID"];

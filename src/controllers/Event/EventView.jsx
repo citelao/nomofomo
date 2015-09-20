@@ -9,12 +9,12 @@ const EventView = React.createClass({
 
 	getDataBindings() {
 		return {
-			user: getters.user
+			userId: getters.userId
 		};
 	},
 
 	componentDidMount() {
-		if(!this.state.user.get("id")) {
+		if(!this.state.userId) {
 			this.history.pushState(null, "/login");
 		}
 	},
