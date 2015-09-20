@@ -24,7 +24,7 @@ const App = React.createClass({
 				this.state.currentEvent.get("lng"),
 				15);
 		} else {
-			if(this.state.location) {
+			if(this.state.location && this.state.location.toJS) {
 				loadMap(React.findDOMNode(this.refs.map),
 					this.state.location.toJS().coords.latitude,
 					this.state.location.toJS().coords.longitude,
