@@ -1,5 +1,8 @@
 /* globals FB */
+import qwest from "qwest";
+
 import reactor from "../../reactor";
+import { apiURL } from "../../constants";
 import actionTypes from "./actionTypes";
 
 export function getLocation() {
@@ -20,7 +23,17 @@ export function login() {
 			if(!response.status) {
 				reactor.dispatch(actionTypes.LOGIN_USER_FAILURE, { response });
 			} else {
-				reactor.dispatch(actionTypes.LOGIN_USER_SUCCESS, { response });
+				FB.api("/me", { fields: ["picture", "name"] }, (r) => {
+					qwest.post(apiURL + "/users", {
+						id: response.authResponse.userID,
+						photo: r.picture.data.url,
+						name: r.name
+					}).then((xhr, resp) => {
+						reactor.dispatch(actionTypes.LOGIN_USER_SUCCESS, { response });
+					}, (error) => {
+						reactor.dispatch(actionTypes.LOGIN_USER_FAILURE, { error });
+					});
+				});
 			}
 		});
 	} else {
@@ -28,7 +41,7 @@ export function login() {
 	}
 }
 
-export function getLoginStatus() {
+export function fetchLogin() {
 	reactor.dispatch(actionTypes.GET_LOGIN, {});
 
 	if(FB) {
@@ -36,7 +49,17 @@ export function getLoginStatus() {
 			if(!response.status) {
 				reactor.dispatch(actionTypes.GET_LOGIN_FAILURE, { response });
 			} else {
-				reactor.dispatch(actionTypes.GET_LOGIN_SUCCESS, { response });
+				FB.api("/me", { fields: ["picture", "name"] }, (r) => {
+					qwest.post(apiURL + "/users", {
+						id: response.authResponse.userID,
+						picture: r.picture.data.url,
+						name: r.name
+					}).then((xhr, resp) => {
+						reactor.dispatch(actionTypes.GET_LOGIN_SUCCESS, { response });
+					}, (error) => {
+						reactor.dispatch(actionTypes.GET_LOGIN_FAILURE, { error });
+					});
+				});
 			}
 		});
 	} else {
