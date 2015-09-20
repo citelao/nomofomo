@@ -18,5 +18,5 @@ before_deploy:
   - rm gulpfile.babel.js
   - rm .eslintrc
   - rm .travis.yml
-  - mv public/* ./*
+  - mv public/* ./
   - rm -r public
