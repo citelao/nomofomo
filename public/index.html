@@ -30,15 +30,26 @@
 			padding: 1rem;
 			background: #fff;
 
-			box-shadow: 0 0 0.5rem rgba(0,0,0,0.5);
+			border-radius: 0.1rem;
+
+			box-shadow: 0 0 0.5rem rgba(0,0,0,0.3);
 			text-align: center;
 		}
 
-		.card--bottom {
-			position: fixed;
-			bottom: 0;
-			/*width: 100%;*/
-		}
+			.card--bottom {
+				position: fixed;
+				bottom: 0;
+				margin-bottom: 0;
+				/*width: 100%;*/
+			}
+
+			.card--hover {
+				text-decoration: none;
+			}
+
+				.card--hover:hover {
+					background: #fbfbfb;
+				}
 
 		.map {
 			position: absolute;
@@ -47,6 +58,10 @@
 			width: 100%;
 			height: 100%;
 			z-index: -1;
+		}
+
+		img {
+			max-width: 100%;
 		}
 
 	</style>

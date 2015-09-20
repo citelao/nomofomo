@@ -19,13 +19,13 @@ const App = React.createClass({
 
 	componentWillMount() {
 		if(this.state.currentEvent.get("lat")) {
-			loadMap(React.findDOMNode(this.refs.wrapper),
+			loadMap(React.findDOMNode(this.refs.map),
 				this.state.currentEvent.get("lat"),
 				this.state.currentEvent.get("lng"),
 				15);
 		} else {
 			if(this.state.location) {
-				loadMap(React.findDOMNode(this.refs.wrapper),
+				loadMap(React.findDOMNode(this.refs.map),
 					this.state.location.toJS().coords.latitude,
 					this.state.location.toJS().coords.longitude,
 					8);
@@ -35,7 +35,7 @@ const App = React.createClass({
 
 	componentWillUpdate(nextProps, nextState) {
 		if(!this.state.currentEvent.get("lat") && nextState.currentEvent.get("lat")) {
-			loadMap(React.findDOMNode(this.refs.wrapper),
+			loadMap(React.findDOMNode(this.refs.map),
 				nextState.currentEvent.get("lat"),
 				nextState.currentEvent.get("lng"),
 				15);
@@ -44,7 +44,7 @@ const App = React.createClass({
 		if(!this.state.currentEvent.get("lat") &&
 			!this.state.location && 
 			nextState.location) {
-			loadMap(React.findDOMNode(this.refs.wrapper),
+			loadMap(React.findDOMNode(this.refs.map),
 				nextState.location.coords.latitude,
 				nextState.location.coords.longitude, 8);
 		}
@@ -54,9 +54,9 @@ const App = React.createClass({
 		return <div>
 			<div className="wrapper">
 				{this.props.children}
-				<Link to="/events/create" className="card card--bottom">Create Event</Link>
+				<Link to="/events/create" className="card card--bottom card--hover">Create Event</Link>
 			</div>
-			<div className="map" ref="wrapper"></div>
+			<div className="map" ref="map"></div>
 		</div>;
 	}
 });
@@ -69,7 +69,7 @@ function loadMap(el, lat, lng, zoom) {
 			zoom: zoom,
 			disableDefaultUI: true
 		});
-	});	
+	});
 }
 
 export default App;
