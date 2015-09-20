@@ -63,3 +63,7 @@ gulp.task("serve", function(callback) {
 		// callback();
 	});
 });
+
+gulp.task("bootstrap", function() {
+	gulp.src("./public/**/*.*").pipe(gulp.dest("dist"));
+});
