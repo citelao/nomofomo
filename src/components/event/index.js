@@ -15,8 +15,14 @@ export default class Event extends React.Component {
 
 	render() {
 		let users = [];
-		for (let i = 0; i < this.props.minAttendance; i++) {
-			users.push(<img src="http://placehold.it/60" alt="a placeholder image"/>);
+		let total = this.props.minAttendance;
+		let filled = this.props.interested;
+		let remaining = total - filled;
+		for (let i = 0; i < filled; i++) {
+			users.push(<img src="interest.png" alt="a placeholder image"/>);
+		}
+		for (let i = 0; i < remaining; i++) {
+			users.push(<img src="smile.png" alt="a placeholder image"/>);
 		}
 
 		return <div className="card">

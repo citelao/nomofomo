@@ -24,7 +24,7 @@ const EventList = React.createClass({
 	},
 
 	handleDecline() {
-		actions.declineEvent(this.state.event.get("id"));
+		actions.declineEvent(this.state.event.get("id"), this.state.userId);
 	},
 
 	handleInterested() {
@@ -50,6 +50,7 @@ const EventList = React.createClass({
 				longitude={this.state.event.get("lng")}
 				description={this.state.event.get("description")}
 				minAttendance={this.state.event.get("min_attendance")}
+				interested={(this.state.event.get("interested_users") || {}).size}
 				onDecline={this.handleDecline}
 				onInterested={this.handleInterested} />
 		</div>;

@@ -5,7 +5,7 @@ export default class Interested extends React.Component {
 	render() {
 		let users = [];
 		for (let i = 0; i < this.props.minAttendance; i++) {
-			users.push(<img src="http://placehold.it/60" alt="a placeholder image"/>);
+			users.push(<img src="smile.png" alt="a placeholder image"/>);
 		}
 
 		return <div className="card">
