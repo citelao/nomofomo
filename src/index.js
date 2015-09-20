@@ -1,21 +1,34 @@
 import React from "react";
-import { Router, Route } from "react-router";
+import { Router, Route, IndexRoute } from "react-router";
 
 import App from "App";
-import Events from "views/Events";
-import Event from "views/Event/Event";
-import EventCreate from "views/Event/EventCreate";
+import Pitch from "controllers/Pitch";
+import EventsView from "controllers/EventsView";
+import EventView from "controllers/Event/EventView";
+import EventCreate from "controllers/Event/EventCreate";
+import EventList from "controllers/Event/EventList";
+import LoginController from "controllers/LoginController";
+
+import { actions } from "modules/session";
+
+actions.getLocation();
+
+document.addEventListener("fb_init", actions.getLoginStatus);
 
 React.render(
 	(<Router>
 		<Route path="/" component={App}>
-			<Route path="events" component={Events}>
-				<Route path=":id" component={Event} />
+			<IndexRoute component={Pitch} />
+			<Route path="events" component={EventsView}>
+				<IndexRoute component={EventList} />
 				<Route path="create" component={EventCreate} />
+				<Route path=":id" component={EventView} />
 			</Route>
+
+			<Route path="login" component={LoginController} />
 		</Route>
 
 		<Route path="*" component={App} />{/* better 404 eventually */}
 	</Router>),
-	document.body
+	document.getElementById("entry")
 );
